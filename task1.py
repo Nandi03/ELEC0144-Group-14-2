@@ -11,11 +11,11 @@ plt.plot(x, d)
 
 # Settings
 
-w0 = 0.5
+w0 = 0.1
 w1 = 0.4
 w2 = 0.2
 
-eta = 0.01
+eta = 0.001
 iteration = 500
 
 # Initial fit
@@ -50,11 +50,12 @@ for i in range(iteration):
         cost = cost + 0.5*(d[j] - w0*x[j]**3 - w1*x[j]**2 - w2*x[j])**2
 
 # Plotting the results
-ytestx0 = w0 * (-1) ** 3 + w1 * (-1) ** 2 - w2 * (-1)
-ytestx4 = w0 * 1 ** 3 + w1 * 1 ** 2 - w2 * 1
+y = []
+for i in range(len(x)):
+    y.append(w0*(x[i])**3 + w1*(x[i])**2 - w2*(x[i]))
 
 plt.figure()
-plt.plot([-1, 1], [ytestx0, ytestx4], 'b')
+plt.plot(x, y)
 plt.title('optimal fit')
 
 plt.figure()
