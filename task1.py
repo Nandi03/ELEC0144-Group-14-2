@@ -78,5 +78,3 @@ plt.plot(w2record)
 plt.title('w2')
 
 plt.show()
-
-
