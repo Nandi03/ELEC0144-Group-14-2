@@ -11,14 +11,15 @@ plt.plot(x, d)
 
 # Settings
 
+# Set intial random values for the weights
 w0 = 0.1
 w1 = 0.4
 w2 = 0.2
 
-eta = 0.001
-iteration = 500
+eta = 0.01
+iteration = 1000
 
-# Initial fit
+# Plot intial fit
 
 ytestx0 = w0*(-1)**3 + w1*(-1)**2 - w2*(-1)
 ytestx4 = w0*(1)**3 + w1*(1)**2 - w2*(1)
@@ -37,22 +38,28 @@ for i in range(iteration):
     cost = 0
     for j in range(len(x)):
         
+        # Calculate predicted value with tanh activation function
+        predicted = np.tanh(w0 * x[j]**3 + w1 * x[j]**2 + w2 * x[j])
+
+        # Calculate gradients with respect to weights
+        grad_w0 = -(d[j] - predicted) * (1 - predicted**2) * x[j]**3
+        grad_w1 = -(d[j] - predicted) * (1 - predicted**2) * x[j]**2
+        grad_w2 = -(d[j] - predicted) * (1 - predicted**2) * x[j]
+        cost = cost + 0.5*(d[j] - w0*x[j]**3 - w1*x[j]**2 - w2*x[j])**2
+
         w0 -= eta * grad_w0
         w1 -= eta * grad_w1
         w2 -= eta * grad_w2
-        
+
         w0record.append(w0)
         w1record.append(w1)
         w2record.append(w2)
-        grad_w0 = -(d[j] - w0 * x[j] ** 3 - w1 * x[j] ** 2 - w2 * x[j]) * x[j]* x[j] * x[j]
-        grad_w1 = -(d[j] - w0 * x[j] ** 3 - w1 * x[j] ** 2 - w2 * x[j]) * x[j] * x[j]
-        grad_w2 = -(d[j] - w0 * x[j] ** 3 - w1 * x[j] ** 2 - w2 * x[j]) * x[j] 
-        cost = cost + 0.5*(d[j] - w0*x[j]**3 - w1*x[j]**2 - w2*x[j])**2
+
 
 # Plotting the results
 y = []
 for i in range(len(x)):
-    y.append(w0*(x[i])**3 + w1*(x[i])**2 - w2*(x[i]))
+    y.append(w0*(x[i])**3 + w1*(x[i])**2 + w2*(x[i]))
 
 plt.figure()
 plt.plot(x, y)
