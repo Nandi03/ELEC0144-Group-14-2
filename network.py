@@ -2,23 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tsensor import explain as exp
 
-def mse(actual, predicted):
-    return (actual - predicted)**2
-
-def mse_grad(actual, predicted):
-    return predicted - actual
-
 # Define the derivative of tanh function
 def tanh_derivative(x):
     return 1.0 - np.tanh(x)**2
 
+# Find the mean squared error
+def mse(actual, predicted):
+    return 0.5*(actual - predicted) ** 2
+
+# derivative of mean squared error to find the direction to go in
+def mse_grad(actual, predicted):
+    return (actual - predicted)
+
 # Initialise the weights randomly
 np.random.seed(42)
-l1_weights = np.random.randn(3, 1)
-l2_weights = np.random.randn(1, 1)
-
+l1_weights = np.array([[0.1, 0.1, 0.1]])
+l2_weights = np.array([[0.1], [0.1], [0.1]])
 # Learning rate
-learning_rate = 0.0005
+learning_rate = 0.00001
 
 # Number of epochs
 epochs = 1000
@@ -34,40 +35,34 @@ for epoch in range(epochs):
     for i in range(len(x_train)):
         # Forward pass
         # This is the output of the layer
-      
+ 
+        # Forward pass
+        l1_output =  np.dot(x_train[i], l1_weights) # Layer 1
+        l1_activated = np.tanh(l1_output) # Apply tanh activation func
+        output = np.dot(l1_activated, l2_weights) # Layer 2
 
-        l1_output = np.dot(x_train[i],l1_weights)
-        l1_activated = np.array(np.tanh(l1_output))
-        l2_output = np.array(np.sum(np.dot( l1_activated, l2_weights ))).reshape(1, 1)
+        # Back-propagation
+        output_grad = mse_grad(d_train[i], output)
+        l2_w_grad = np.dot(l1_activated.T, output_grad)
 
-        # Compute the error
-        error = mse(d_train[i], l2_output)
+        l1_activated_grad = np.dot(output_grad, l2_weights.T)
+        l1_output_grad = tanh_derivative(l1_activated_grad)
 
-        # Backpropagation
-        error_grad = mse_grad(d_train[i],l2_output)
-        output_grad = mse_grad(d_train[i], l2_output)
-        
-        # Update weights using gradient descent
-        l2_w_gradient =  np.dot(l1_activated, output_grad) 
-        diff = np.dot(l2_w_gradient, learning_rate)
-        l1_weights = np.subtract(l1_weights, diff)
+        l1_w_grad = np.dot(x_train[i], l1_output_grad)
 
-        l1_activated_grad = np.dot(output_grad,l2_weights)
-        l1_output_gradient = np.dot( (np.subtract(np.array([[1.0], [1.0], [1.0]]), np.exp(l1_output, np.array([[2.0], [2.0], [2.0]])))), l1_activated_grad )
-        l1_w_gradient = np.dot(x_train[i] , l1_output_gradient)
+        l2_weights = np.subtract(l2_weights, l2_w_grad * learning_rate)
+        l1_weights = np.subtract(l1_weights, l1_w_grad * learning_rate)
 
-        l1_weights -= np.dot(l1_w_gradient , learning_rate)
 
-        
 
 y = []
 
 for i in range(len(x_train)):
-    l1_output = np.dot(x_train[i],l1_weights)
-    l1_activated = np.array(np.tanh(l1_output))
-    l2_output = (np.sum(np.dot( l1_activated, l2_weights )))
+    l1_output =  np.dot(x_train[i], l1_weights) # Layer 1
+    l1_activated = np.tanh(l1_output) # Apply tanh activation func
+    output = np.sum(np.dot(l1_activated, l2_weights)) # Layer 2
 
-    y.append(l2_output)
+    y.append(output)
 
 # Plot the input-output relationship
 plt.figure()
@@ -80,6 +75,6 @@ plt.legend()
 plt.show()
 
 print(l1_weights)
-print(l2_weights)
 
+        
 
