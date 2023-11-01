@@ -34,9 +34,6 @@ for epoch in range(epochs):
     # Iterate through each training example
     for i in range(len(x_train)):
         # Forward pass
-        # This is the output of the layer
- 
-        # Forward pass
         l1_output =  np.dot(x_train[i], l1_weights) # Layer 1
         l1_activated = np.tanh(l1_output) # Apply tanh activation func
         output = np.dot(l1_activated, l2_weights) # Layer 2
@@ -52,8 +49,6 @@ for epoch in range(epochs):
 
         l2_weights = np.subtract(l2_weights, l2_w_grad * learning_rate)
         l1_weights = np.subtract(l1_weights, l1_w_grad * learning_rate)
-
-
 
 y = []
 
