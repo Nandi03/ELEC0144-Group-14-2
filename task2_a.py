@@ -5,9 +5,7 @@ import pandas as pd
 # Read the CSV-style text file into a DataFrame
 data = pd.read_csv('IrisData.txt')
 
-# Now, 'df' is a Pandas DataFrame containing the data
 print(data)
-
 
 # Activation functions and their derivatives
 def tanh(x):
@@ -30,10 +28,10 @@ hidden_size_2 = 3
 output_size = 3
 
 l1_weights = np.random.randn(input_size, hidden_size_1) * np.sqrt(2 / (input_size + hidden_size_1))
-l1_bias = np.zeros((1, hidden_size_1))  # Bias for hidden layer
+l1_bias = np.zeros((1, hidden_size_1))  # Bias for hidden layer 1
 
 l2_weights = np.random.randn(hidden_size_1,hidden_size_2) * np.sqrt(2 / (hidden_size_1 + hidden_size_2))
-l2_bias = np.zeros((1, hidden_size_2))  # Bias for output layer
+l2_bias = np.zeros((1, hidden_size_2))  # Bias for hidden layer 2
 
 l3_weights = np.random.randn(hidden_size_2, output_size) * np.sqrt(2 / (hidden_size_2 + output_size))
 l3_bias = np.zeros((1, output_size))  # Bias for output layer
