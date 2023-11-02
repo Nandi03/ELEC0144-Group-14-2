@@ -78,20 +78,21 @@ for epoch in range(epochs):
         print(f'Epoch: {epoch}, Mean Loss: {mean_epoch_loss:.6f}')
 
 
-
+x_test = np.arange(-0.97, 0.93, 0.1)
+y_test = 0.8* x_test**3 + 0.3 * x_test**2 - 0.4*x_test + np.random.normal(0, 0.02, len(x_test))
 predictions = []
-for i in range(len(x_train)):
-    hidden_input = np.dot(x_train[i], l1_weights) + l1_bias
-    hidden_output = np.tanh(hidden_input)
-    output = np.sum(np.dot(hidden_output, l2_weights) + l2_bias)
+for i in range(len(x_test)):
+    l1_input = np.dot(x_test[i], l1_weights) + l1_bias
+    l1_activated = np.tanh(l1_input)
+    output = np.sum(np.dot(l1_activated, l2_weights) + l2_bias)
     predictions.append(output)
 
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
-plt.scatter(x_train, d_train, color='blue', label='Training Data')
-plt.plot(x_train, predictions, color='red', marker='o', linestyle='dashed', linewidth=2, markersize=8, label='Predictions')
-plt.xlabel('X')
-plt.ylabel('y')
+plt.scatter(x_test, y_test, color='blue', label='Training Data')
+plt.plot(x_test, predictions, color='red', marker='o', linestyle='dashed', linewidth=2, markersize=8, label='Predictions')
+plt.xlabel('X_test')
+plt.ylabel('Y')
 plt.title('Cubic Function Approximation using Neural Network (Sequential Learning)')
 plt.legend()
 plt.grid(True)
