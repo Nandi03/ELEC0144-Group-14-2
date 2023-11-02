@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from tsensor import explain as exp
 
 # Generate some random training data
 x_train = np.arange(-1, 1, 0.05)

@@ -1,10 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Generate some random training data
-x_train = np.arange(-1, 1, 0.05)
-d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train))
-
 # Activation functions and their derivatives
 def tanh(x):
     return np.tanh(x)
@@ -20,9 +16,10 @@ def mse_grad(actual, predicted):
 
 # Initialize weights randomly
 np.random.seed(42)
-input_size = 1
-hidden_size = 3
-output_size = 1
+input_size = 4
+hidden_size_1 = 5
+hidden_size_2 = 3
+output_size = 3
 
 l1_weights = np.random.randn(input_size, hidden_size) * np.sqrt(2 / (input_size + hidden_size))
 l1_bias = np.zeros((1, hidden_size))  # Bias for hidden layer
@@ -35,7 +32,6 @@ learning_rate = 0.1
 
 # Number of epochs
 epochs = 1000
-
 
 # Training the neural network using stochastic gradient descent
 for epoch in range(epochs):
