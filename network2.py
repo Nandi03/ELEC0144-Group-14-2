@@ -8,8 +8,8 @@ Y_train = 0.8* X_train**3 + 0.3 * X_train**2 - 0.4*X_train + np.random.normal(0,
 
 # Build the neural network
 model = tf.keras.Sequential([
-    tf.keras.layers.Dense(3, activation='tanh', input_shape=(1,)),
-    tf.keras.layers.Dense(1, activation='linear')
+    tf.keras.layers.Dense(3, activation='LeakuRelu', input_shape=(1,)),
+    tf.keras.layers.Dense(1, activation='tanh')
 ])
 
 # Compile the model with SGD optimizer and mean squared error loss function

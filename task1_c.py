@@ -2,10 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tsensor import explain as exp
 
-# Generate some random training data
-x_train = np.arange(-1, 1, 0.05)
-d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train))
-
 # Activation functions and their derivatives
 def tanh(x):
     return np.tanh(x)
