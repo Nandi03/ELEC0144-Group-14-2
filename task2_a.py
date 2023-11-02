@@ -1,5 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+
+# Read the CSV-style text file into a DataFrame
+data = pd.read_csv('IrisData.txt')
+
+print(data)
 
 # Activation functions and their derivatives
 def tanh(x):
@@ -16,22 +22,25 @@ def mse_grad(actual, predicted):
 
 # Initialize weights randomly
 np.random.seed(42)
-input_size = 1
-hidden_size = 3
-output_size = 1
+input_size = 4
+hidden_size_1 = 5
+hidden_size_2 = 3
+output_size = 3
 
-l1_weights = np.random.randn(input_size, hidden_size) * np.sqrt(2 / (input_size + hidden_size))
-l1_bias = np.zeros((1, hidden_size))  # Bias for hidden layer
-l2_weights = np.random.randn(hidden_size, output_size) * np.sqrt(2 / (hidden_size + output_size))
-l2_bias = np.zeros((1, output_size))  # Bias for output layer
+l1_weights = np.random.randn(input_size, hidden_size_1) * np.sqrt(2 / (input_size + hidden_size_1))
+l1_bias = np.zeros((1, hidden_size_1))  # Bias for hidden layer 1
 
+l2_weights = np.random.randn(hidden_size_1,hidden_size_2) * np.sqrt(2 / (hidden_size_1 + hidden_size_2))
+l2_bias = np.zeros((1, hidden_size_2))  # Bias for hidden layer 2
+
+l3_weights = np.random.randn(hidden_size_2, output_size) * np.sqrt(2 / (hidden_size_2 + output_size))
+l3_bias = np.zeros((1, output_size))  # Bias for output layer
 
 # Learning rate
 learning_rate = 0.1
 
 # Number of epochs
 epochs = 1000
-
 
 # Training the neural network using stochastic gradient descent
 for epoch in range(epochs):
@@ -56,6 +65,9 @@ for epoch in range(epochs):
         
         l2_weights -= learning_rate * np.outer(l1_activated, output_grad)
         l2_bias -= learning_rate * output_grad
+
+        l3_weights -= learning_rate * np.outer(l1_activated, output_grad)
+        l3_bias -= learning_rate * output_grad
 
         # Compute individual sample loss
         sample_loss = 0.5 * ((output - d_train[i])**2)

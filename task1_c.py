@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from tsensor import explain as exp
 
 # Activation functions and their derivatives
 def tanh(x):
@@ -32,11 +31,6 @@ learning_rate = 0.1
 
 # Number of epochs
 epochs = 1000
-
-# Training data
-x_train = np.arange(-1, 1, 0.05)
-d_train = 0.8* x_train**3 + 0.3 * x_train**2 - 0.4*x_train + np.random.normal(0, 0.02, len(x_train))
-
 
 # Training the neural network using stochastic gradient descent
 for epoch in range(epochs):
@@ -93,6 +87,3 @@ plt.title('Cubic Function Approximation using Neural Network (Sequential Learnin
 plt.legend()
 plt.grid(True)
 plt.show()
-
-        
-
