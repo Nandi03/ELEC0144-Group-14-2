@@ -25,6 +25,10 @@ l1_bias = np.zeros((1, hidden_size))  # Bias for hidden layer
 l2_weights = np.random.randn(hidden_size, output_size) * np.sqrt(2 / (hidden_size + output_size))
 l2_bias = np.zeros((1, output_size))  # Bias for output layer
 
+# Generate some random training data
+x_train = np.arange(-1, 1, 0.05)
+d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train))
+
 
 # Learning rate
 learning_rate = 0.1
