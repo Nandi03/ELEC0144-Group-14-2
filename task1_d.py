@@ -198,6 +198,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+# https://towardsdatascience.com/how-do-relu-neural-networks-approximate-any-continuous-function-f59ca3cf2c39
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # layer 1 = ReLu
