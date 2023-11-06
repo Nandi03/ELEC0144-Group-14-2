@@ -76,7 +76,7 @@ for epoch in range(epochs):
         v_l2 = beta2 * v_l2 + (1 - beta2) * (output_grad ** 2)
         v_l2_corrected = v_l2 / (1 - pow(beta2, i+1))
 
-
+        # Update weights and biases
         l1_weights -= learning_rate * m_l1_corrected / (np.sqrt(v_l1_corrected) + epsilon)
         l1_bias -= learning_rate * m_l1_corrected / (np.sqrt(v_l1_corrected) + epsilon)
         l2_weights -= learning_rate * m_l2_corrected / (np.sqrt(v_l2_corrected) + epsilon)
