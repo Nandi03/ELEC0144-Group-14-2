@@ -153,7 +153,7 @@ for epoch in range(epochs):
         loss = mse(d_train[i], output)
 
         # Back-propagation
-        output_grad = mse_grad(d_train[i], output)
+        output_grad = mse_grad(d_train[i], output) 
         l1_output_grad = np.dot(output_grad, l2_weights.T) * relu_derivative(l1_output)
 
         # Update weights using gradient descent
