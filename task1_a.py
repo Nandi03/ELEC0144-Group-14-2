@@ -82,6 +82,7 @@ for i in range(len(x_test)):
     output = np.sum(np.dot(l1_activated, l2_weights) + l2_bias)
     predictions.append(output)
 
+
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
 plt.scatter(x_test, y_test, color='blue', label='Training Data')
