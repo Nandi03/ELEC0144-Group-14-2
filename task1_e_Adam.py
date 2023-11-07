@@ -27,16 +27,16 @@ l2_weights = np.random.randn(hidden_size, output_size) * np.sqrt(2 / (hidden_siz
 l2_bias = np.zeros((1, output_size))  # Bias for output layer
 
 # Adam optimizer parameters
-beta1 = 0.9
-beta2 = 0.99
-epsilon = 1e-8
+beta1 = 0.6
+beta2 = 0.7
+epsilon = 1e-4
 m_l1 = np.zeros_like(l1_weights)
 v_l1 = np.zeros_like(l1_weights)
 m_l2 = np.zeros_like(l2_weights)
 v_l2 = np.zeros_like(l2_weights)
 
 # Learning rate
-learning_rate = 0.0009
+learning_rate = 0.001
 
 # Number of epochs
 epochs = 1000
