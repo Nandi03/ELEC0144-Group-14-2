@@ -59,7 +59,7 @@ for epoch in range(epochs):
         l2_weights -= learning_rate * np.outer(l1_output, output_grad)
         l2_bias -= learning_rate * output_grad
 
-        training_loss.append(loss[0])
+    training_loss.append(float(loss[0]))
 
     if epoch % 100 == 0:
         print(f'Epoch: {epoch},  Loss: {loss[0]}')
@@ -81,6 +81,15 @@ plt.plot(x_test, predictions, color='red', marker='o', linestyle='dashed', linew
 plt.xlabel('X_test')
 plt.ylabel('Y')
 plt.title('Cubic Function Approximation using Neural Network (Sequential Learning)')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(8, 6))
+plt.plot(training_loss, color='blue', label='Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Mean Squared Error')
+plt.title('Training Loss Curve')
 plt.legend()
 plt.grid(True)
 plt.show()
@@ -156,7 +165,7 @@ for epoch in range(epochs):
         l2_weights -= learning_rate * np.outer(l1_activated, output_grad)
         l2_bias -= learning_rate * output_grad
 
-        training_loss.append(loss[0])
+    training_loss.append(loss[0])
 
 
     if epoch % 100 == 0:
@@ -173,7 +182,6 @@ for i in range(len(x_test)):
     output = np.sum(np.dot(l1_activated, l2_weights) + l2_bias ) # Layer 2
     predictions.append(output)
 
-
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
 plt.scatter(x_test, y_test, color='blue', label='Training Data')
@@ -184,6 +192,15 @@ plt.title('Cubic Function Approximation using Neural Network (Sequential Learnin
 plt.legend()
 plt.grid(True)
 plt.show()
+plt.figure(figsize=(8, 6))
+plt.plot(training_loss, color='blue', label='Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Mean Squared Error')
+plt.title('Training Loss Curve')
+plt.legend()
+plt.grid(True)
+plt.show()
+
 
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -243,7 +260,7 @@ for epoch in range(epochs):
         l2_weights -= learning_rate * np.outer(l1_output, output_grad)
         l2_bias -= learning_rate * output_grad
 
-        training_loss.append(loss[0])
+    training_loss.append(loss[0])
 
 
     if epoch % 100 == 0:
@@ -271,6 +288,14 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+plt.figure(figsize=(8, 6))
+plt.plot(training_loss, color='blue', label='Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Mean Squared Error')
+plt.title('Training Loss Curve')
+plt.legend()
+plt.grid(True)
+plt.show()
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # layer 1 = Leaky ReLu
@@ -336,7 +361,7 @@ for epoch in range(epochs):
         l2_weights -= learning_rate * np.outer(l1_activated, output_grad)
         l2_bias -= learning_rate * output_grad
 
-        training_loss.append(loss[0])
+    training_loss.append(loss[0])
 
     if epoch % 100 == 0:
         print(f'Epoch: {epoch}, Loss: {loss[0]}')
@@ -360,6 +385,14 @@ plt.plot(x_test, predictions, color='red', marker='o', linestyle='dashed', linew
 plt.xlabel('X_test')
 plt.ylabel('Y')
 plt.title('Cubic Function Approximation using Neural Network (Sequential Learning)')
+plt.legend()
+plt.grid(True)
+plt.show()
+plt.figure(figsize=(8, 6))
+plt.plot(training_loss, color='blue', label='Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Mean Squared Error')
+plt.title('Training Loss Curve')
 plt.legend()
 plt.grid(True)
 plt.show()
