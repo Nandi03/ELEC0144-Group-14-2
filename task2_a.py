@@ -5,8 +5,6 @@ import pandas as pd
 # Read the CSV-style text file into a DataFrame
 data = pd.read_csv('IrisData.txt')
 
-print(data)
-
 # Activation functions and their derivatives
 def tanh(x):
     return np.tanh(x)
