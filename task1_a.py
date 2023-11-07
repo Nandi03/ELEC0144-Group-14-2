@@ -1,10 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Generate some random training data
-x_train = np.arange(-1, 1, 0.05)
-d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train))
-
 # Activation functions and their derivatives
 def tanh(x):
     return np.tanh(x)
@@ -35,6 +31,10 @@ learning_rate = 0.1
 
 # Number of epochs
 epochs = 1000
+
+# Generate some random training data
+x_train = np.arange(-1, 1, 0.05)
+d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train))
 
 
 # Training the neural network using stochastic gradient descent
@@ -81,6 +81,7 @@ for i in range(len(x_test)):
     l1_activated = np.tanh(l1_input)
     output = np.sum(np.dot(l1_activated, l2_weights) + l2_bias)
     predictions.append(output)
+
 
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
