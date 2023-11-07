@@ -6,7 +6,7 @@ x_train = np.arange(-1, 1, 0.05)
 d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train))
 
 # Initialize network parameters
-np.random.seed(0)
+np.random.seed(42)
 input_size = 1
 hidden_size = 3
 output_size = 1
