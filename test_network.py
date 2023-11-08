@@ -3,10 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 np.random.seed(0)
-model = Model(learning_rate=0.001, optimizer="sgd")
+model = Model(learning_rate=0.1, optimizer="sgd_adaptive")
+model.momentum = 0.3
 
-model.layers.append(Layer(3, "sigmoid", 1, 3))
-model.layers.append(Layer(1, "linear", 3, 1))
+model.layers.append(Layer("relu", 1, 3))
+model.layers.append(Layer("linear", 3, 1))
 
 x_train = np.arange(-1, 1, 0.05)
 d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train))

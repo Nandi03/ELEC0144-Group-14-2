@@ -7,7 +7,7 @@ class Model:
         '''
         epochs: int
         learning_rate: float 0-1
-        optimizer: sgd, adam
+        optimizer: sgd, adam, sgd-momentum, sgd-adaptive
         '''
         self.layers = []
         self.epochs = epochs
@@ -16,6 +16,7 @@ class Model:
         self.history = []  # training loss
         self.betas = [0.9, 0.99]
         self.epsilon = 1e-8
+        self.momentum = 0.5 # a constant between 0 and 1
 
 
     def compile(self, x, y):
@@ -23,9 +24,10 @@ class Model:
            self.sgd(x, y)
         if self.optimizer == "adam":
            self.adam(x, y)
-
-        if self.optimizer == "newton":
-            self.newton_gauss(x, y)
+        if self.optimizer == "sgd_momentum":
+            self.sgd_momentum(x, y)
+        if self.optimizer == "sgd_adaptive":
+            self.sgd_adaptive(x, y)
 
     def sgd(self, x, y):
         for epoch in range(self.epochs):
@@ -86,7 +88,58 @@ class Model:
 
     
 
+    def sgd_momentum(self, x, y):
+        for epoch in range(self.epochs):
+            for i in range(len(x)):
+                # Forward pass
+                output, output_deactivated, input = self.forward(x[i])
+            
+                # Backpropagation
+                loss = self.mse(y[i], output)
+                output_grad = None
 
+                for j in range(len(self.layers) - 1, -1, -1):
+                    if j == len(self.layers) - 1:
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                    else:
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+
+                    # Update velocities with momentum
+                    self.layers[j].velocity = self.momentum * self.layers[j].velocity + self.learning_rate * np.outer(input[j], output_grad)
+                    self.layers[j].bias_velocity = self.momentum * self.layers[j].bias_velocity + self.learning_rate * output_grad
+
+                    # Update weights and biases using momentum
+                    self.layers[j].weights -= self.layers[j].velocity
+                    self.layers[j].bias -= self.layers[j].bias_velocity
+
+            self.history.append(float(loss[0]))
+
+        
+    def sgd_adaptive(self, x, y):
+        for epoch in range(self.epochs):
+            for i in range(len(x)):
+                # Forward pass
+                output, output_deactivated, input = self.forward(x[i])
+
+                # Backpropagation
+                loss = self.mse(y[i], output)
+                output_grad = None
+
+                for j in range(len(self.layers) - 1, -1, -1):
+                    if j == len(self.layers) - 1:
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                    else:
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+
+                    # Accumulate squared gradients for Adagrad
+                    self.layers[j].velocity += output_grad**2
+                    self.layers[j].bias_velocity  += np.sum(output_grad**2)
+
+                    # Update weights and biases using Adagrad
+                    self.layers[j].weights -= (self.learning_rate / (np.sqrt(self.layers[j].velocity) + self.epsilon)) * np.outer(input[j], output_grad)
+                    self.layers[j].bias -= (self.learning_rate / (np.sqrt(self.layers[j].bias_velocity) + self.epsilon)) * output_grad
+
+            self.history.append(float(loss[0]))
 
     def forward(self, x):
          # Forward pass
@@ -122,14 +175,17 @@ class Model:
 
 
 class Layer:
-    def __init__(self, nodes=1, activation="linear", input_shape=1, output_shape=1, beta=0.9):
-        self.nodes = nodes
+    def __init__(self, activation="linear", input_shape=1, output_shape=1, beta=0.9):
         self.activation = activation
-        self.shape = [input_shape, nodes]
         self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
-        self.bias = np.zeros((1, output_shape))  
+        self.bias = np.zeros((1, output_shape)) 
+
+        # for adam 
         self.m_W, self.m_B = 0, 0
         self.v_W, self.v_B = 0, 0
+        # for sgd + momentum
+        self.velocity = np.zeros_like(self.weights)
+        self.bias_velocity = np.zeros_like(self.bias)
 
 
     def get_activation(self, x, alpha=0.1):
