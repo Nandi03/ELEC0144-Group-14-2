@@ -6,9 +6,9 @@ np.random.seed(0)
 model = Model(learning_rate=0.1, optimizer="sgd")
 #model.momentum = 0.3
 
-model.layers.append(Layer("tanh", 4, 5))
+model.layers.append(Layer("tanh", 1, 5))
 model.layers.append(Layer("tanh", 5, 3))
-model.layers.append(Layer("linear", 3, 3))
+model.layers.append(Layer("tanh", 3, 1))
 
 x_train = np.arange(-1, 1, 0.05)
 num_elements = int(0.8 * len(x_train)) 
