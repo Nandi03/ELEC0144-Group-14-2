@@ -123,7 +123,7 @@ class Model:
 
                 # Backpropagation
                 loss = self.mse(y[i], output)
-                output_grad = None
+                output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
@@ -142,7 +142,7 @@ class Model:
             self.history.append(float(loss[0]))
 
     def forward(self, x):
-         # Forward pass
+        # Forward pass
         output = None
         output_deactivated = []
         input = [x]
@@ -168,7 +168,9 @@ class Model:
                 output = (np.dot(input, self.layers[j].weights) + self.layers[j].bias) 
                 output_activated = self.layers[j].get_activation(output)
                 input = output_activated
-            predictions.append(np.sum(output_activated))
+                if len(output_activated) == 1:
+                    output_activated = np.sum(output_activated)
+            predictions.append(output_activated)
 
 
         return predictions
@@ -179,7 +181,6 @@ class Layer:
         self.activation = activation
         self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
         self.bias = np.zeros((1, output_shape)) 
-
         # for adam 
         self.m_W, self.m_B = 0, 0
         self.v_W, self.v_B = 0, 0
@@ -192,16 +193,16 @@ class Layer:
         if self.activation == "sigmoid":
             return 1 / (1 + np.exp(-x))
         
-        if self.activation == "relu":
+        elif self.activation == "relu":
             return np.maximum(0, x)
         
-        if self.activation == "linear":
+        elif self.activation == "linear":
             return x
         
-        if self.activation == "leaky_relu":
+        elif self.activation == "leaky_relu":
             return np.where(x > 0, x, alpha * x)
         
-        if self.activation == "tanh":
+        elif self.activation == "tanh":
             return np.tanh(x)
 
         raise ValueError
@@ -211,17 +212,17 @@ class Layer:
     def get_derivative(self, x, alpha=0.1):
 
         if self.activation == "sigmoid":
-            return x * (1 - x)
+            return self.get_activation(x) * (1 - self.get_activation(x))
         
-        if self.activation == "relu":
+        elif self.activation == "relu":
             return np.where(x > 0, 1, 0)
         
-        if self.activation == "linear":
+        elif self.activation == "linear":
             return 1
         
-        if self.activation == "leaky_relu":
+        elif self.activation == "leaky_relu":
             return np.where(x > 0, 1, alpha)
         
-        if self.activation == "tanh":
+        elif self.activation == "tanh":
             return 1.0 - np.tanh(x)**2
         
