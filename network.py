@@ -84,38 +84,7 @@ class Model:
                     self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
             self.history.append(float(loss[0]))
 
-    def newton_gauss(self, x, y):
-        for epoch in range(self.epochs):
-            for i in range(len(x)):
-                output, output_deactivated, input_values = self.forward(x[i])
-
-                # Compute loss and its gradient
-                loss = self.mse(y[i], output)
-                output_grad = self.mse_grad(y[i], output)
-
-                # Compute Hessian matrix (second derivative of loss w.r.t. weights)
-                hessian = np.zeros((sum(np.prod(layer.weights.shape) for layer in self.layers), sum(np.prod(layer.weights.shape) for layer in self.layers)))
-                start_row, start_col = 0, 0
-                for j in range(len(self.layers) - 1, -1, -1):
-                    activation_derivative = self.layers[j].get_derivative(output_deactivated[j])
-                    num_params = np.prod(self.layers[j].weights.shape)
-                    hessian[start_row:start_row + num_params, start_col:start_col + num_params] = np.outer(activation_derivative, activation_derivative) * np.outer(input_values[j], input_values[j])
-                    start_row += num_params
-                    start_col += num_params
-
-                # Update weights using Newton's method
-                flattened_weights = np.concatenate([layer.weights.flatten() for layer in self.layers])
-                flattened_grad = np.concatenate([np.outer(input_values[j], output_grad).flatten() for j in range(len(self.layers) - 1, -1, -1)])
-                flattened_weights -= np.dot(np.linalg.inv(hessian), flattened_grad) * self.learning_rate
-
-                # Reshape and update weights in layers
-                start_idx = 0
-                for layer in self.layers:
-                    num_params = np.prod(layer.weights.shape)
-                    layer.weights = flattened_weights[start_idx:start_idx + num_params].reshape(layer.weights.shape)
-                    start_idx += num_params
-
-                self.history.append(float(loss[0]))
+    
 
 
 

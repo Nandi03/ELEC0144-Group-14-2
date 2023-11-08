@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 np.random.seed(0)
-model = Model(learning_rate=0.001, optimizer="newton")
+model = Model(learning_rate=0.001, optimizer="sgd")
 
 model.layers.append(Layer(3, "sigmoid", 1, 3))
 model.layers.append(Layer(1, "linear", 3, 1))
