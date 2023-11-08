@@ -6,9 +6,6 @@ np.random.seed(42)
 model = Model(epochs=1000,learning_rate=0.1, optimizer="sgd")
 #model.momentum = 0.3
 
-# model.layers.append(Layer("tanh", 1, 3))
-# model.layers.append(Layer("linear", 3, 1))
-
 model.layers.append(Layer("sigmoid", 1, 3))
 model.layers.append(Layer("linear", 3, 1))
 
