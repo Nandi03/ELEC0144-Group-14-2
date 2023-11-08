@@ -2,12 +2,13 @@ from network import Model, Layer
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(42)
-model = Model(epochs=1000,learning_rate=0.1, optimizer="sgd")
+np.random.seed(0)
+model = Model(learning_rate=0.1, optimizer="sgd")
 #model.momentum = 0.3
 
-model.layers.append(Layer("sigmoid", 1, 3))
-model.layers.append(Layer("linear", 3, 1))
+model.layers.append(Layer("sigmoid", 1, 5))
+model.layers.append(Layer("tanh", 5, 3))
+model.layers.append(Layer("tanh", 3, 1))
 
 x_train = np.arange(-1, 1, 0.05)
 num_elements = int(0.8 * len(x_train)) 
