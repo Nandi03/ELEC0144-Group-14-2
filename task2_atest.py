@@ -6,7 +6,7 @@ np.random.seed(0)
 model = Model(learning_rate=0.1, optimizer="sgd")
 #model.momentum = 0.3
 
-model.layers.append(Layer("tanh", 1, 5))
+model.layers.append(Layer("sigmoid", 1, 5))
 model.layers.append(Layer("tanh", 5, 3))
 model.layers.append(Layer("tanh", 3, 1))
 
