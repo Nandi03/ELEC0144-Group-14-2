@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from tsensor import explain as exp
 
 np.random.seed(0)
 class Model:
@@ -18,21 +19,25 @@ class Model:
         self.epsilon = 1e-8
         self.momentum = 0.5 # a constant between 0 and 1
         self.classification = classification
+        
 
     def cross_entropy(self, actual, predicted):
-        loss_sum = 0
-        for i in range(len(predicted)):
-            y_pred = max(self.epsilon, min(1 - self.epsilon, predicted[0][i]))
-            loss_sum += -(actual * math.log(y_pred))  
-        return [loss_sum]
+        actual_one_hot = np.eye(len(predicted[0]))[int(actual)]
+        predicted = np.clip(predicted, 0.1, 0.9)  # Clip to avoid numerical instability
+        loss = -np.sum(actual_one_hot * np.log(predicted))
+        loss /= len(predicted[0])
+        return np.array([loss])
 
     def cross_entropy_grad(self, actual, predicted):
-        grad_sum = 0
-        for i in range(len(predicted)):
-            y_pred = max(self.epsilon, min(1 - self.epsilon, predicted[0][i]))
-            grad_sum += -(actual /y_pred) 
-        return [grad_sum]
+        actual_one_hot = np.eye(len(predicted[0]))[int(actual)]
+        predicted = np.clip(predicted, 0.1, 0.9)  # Clip to avoid numerical instability
+        gradients = -actual_one_hot / predicted
+        return gradients
     
+    def softmax(x):
+        e_x = np.exp(x - np.max(x, axis=-1, keepdims=True))
+        return e_x / np.sum(e_x, axis=-1, keepdims=True)
+        
 
     def compile(self, x, y):
         if self.optimizer == "sgd":
@@ -43,6 +48,7 @@ class Model:
             self.sgd_momentum(x, y)
         if self.optimizer == "sgd_adaptive":
             self.sgd_adaptive(x, y)
+        
 
     def sgd(self, x, y):
         for epoch in range(self.epochs):
@@ -61,10 +67,11 @@ class Model:
     
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if self.classification:
+                        if not self.classification:
                             output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
                         else:
                             output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
@@ -90,7 +97,7 @@ class Model:
                 output_grad = None
                 for j in range(len(self.layers)-1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if self.classification:
+                        if not self.classification:
                             output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
                         else:
                             output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
@@ -131,7 +138,7 @@ class Model:
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if self.classification:
+                        if not self.classification:
                             output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
                         else:
                             output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
@@ -161,11 +168,11 @@ class Model:
                     loss = self.cross_entropy(y[i], output)
                 else:
                     loss = self.mse(y[i], output)
-                output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if self.classification:
+                        if not self.classification:
                             output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
                         else:
                             output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
@@ -219,9 +226,10 @@ class Model:
 
 
 class Layer:
-    def __init__(self, activation="linear", input_shape=1, output_shape=1, beta=0.9):
+    def __init__(self, activation="linear", input_shape=1, output_shape=1):
         self.activation = activation
         self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
+    
         self.bias = np.zeros((1, output_shape)) 
         # for adam 
         self.m_W, self.m_B = 0, 0
@@ -246,6 +254,10 @@ class Layer:
         
         elif self.activation == "tanh":
             return np.tanh(x)
+        
+        elif self.activation == "softmax":
+            e_x = np.exp(x - np.max(x))  # Avoid numerical instability by subtracting the maximum value
+            return e_x / e_x.sum(axis=-1, keepdims=True)
 
         raise ValueError("Invalid Activation ")
 
@@ -267,6 +279,11 @@ class Layer:
         
         elif self.activation == "tanh":
             return 1.0 - np.tanh(x)**2
+        
+        elif self.activation == "softmax":
+            softmax_probs = self.get_activation(x)
+            d_softmax = softmax_probs * (1 - softmax_probs)
+            return d_softmax
         
 
         
