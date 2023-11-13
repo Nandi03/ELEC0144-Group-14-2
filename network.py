@@ -1,9 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import math
+from tsensor import explain as exp
 
 np.random.seed(0)
 class Model:
-    def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd") -> None:
+    def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd", classification=False) -> None:
         '''
         epochs: int
         learning_rate: float 0-1
@@ -17,7 +18,26 @@ class Model:
         self.betas = [0.9, 0.99]
         self.epsilon = 1e-8
         self.momentum = 0.5 # a constant between 0 and 1
+        self.classification = classification
+        
 
+    def cross_entropy(self, actual, predicted):
+        actual_one_hot = np.eye(len(predicted[0]))[int(actual)]
+        predicted = np.clip(predicted, self.epsilon, 1.0 - self.epsilon)  # Clip to avoid numerical instability
+        loss = -np.sum(actual_one_hot * np.log(predicted))
+        loss /= len(predicted[0])
+        return np.array([loss])
+
+    def cross_entropy_grad(self, actual, predicted):
+        actual_one_hot = np.eye(len(predicted[0]))[int(actual)]
+        predicted = np.clip(predicted, 0.1, 0.9)  # Clip to avoid numerical instability
+        gradients = -actual_one_hot / predicted
+        return gradients
+    
+    def softmax(x):
+        e_x = np.exp(x - np.max(x, axis=-1, keepdims=True))
+        return e_x / np.sum(e_x, axis=-1, keepdims=True)
+        
 
     def compile(self, x, y):
         if self.optimizer == "sgd":
@@ -28,6 +48,7 @@ class Model:
             self.sgd_momentum(x, y)
         if self.optimizer == "sgd_adaptive":
             self.sgd_adaptive(x, y)
+        
 
     def sgd(self, x, y):
         for epoch in range(self.epochs):
@@ -36,12 +57,22 @@ class Model:
                 output, output_deactivated, input = self.forward(x[i])
             
                 # backpropagation
-                loss = self.mse(y[i], output)
+                loss = None
+                if self.classification:
+                    softmax_output = self.softmax(output)
+                    loss = self.cross_entropy(y[i], output)
+                else:
+                    loss = self.mse(y[i], output)
+                                    
                 output_grad = None
     
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                        if not self.classification:
+                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                        else:
+                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
@@ -49,44 +80,54 @@ class Model:
                     self.layers[j].bias -= self.learning_rate * output_grad
 
             self.history.append(float(loss[0]))
+    
+    def softmax(self, x):
+        e_x = np.exp(x - np.max(x))  # Avoid numerical instability by subtracting the maximum value
+        return e_x / e_x.sum(axis=-1, keepdims=True)
 
     def adam(self, x, y):
         if len(self.betas) != 2:
             raise IndexError
         for epoch in range(self.epochs):
-            for i in range(len(x)):
-                output, output_deactivated, input = self.forward(x[i])
+            with exp() as c:
+                for i in range(len(x)):
+                    output, output_deactivated, input = self.forward(x[i])
 
-                # Back propagation
-                loss = self.mse(y[i], output)
-
-                output_grad = None
-                for j in range(len(self.layers)-1, -1, -1):
-                    if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
-                        
+                    # Back propagation
+                    loss = None
+                    if self.classification:
+                        softmax_output = self.softmax(output)
+                        loss = self.cross_entropy(y[i], softmax_output)
                     else:
-                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
-                    dW = np.dot(input[j].T, output_grad)
-                    dB = output_grad
+                        loss = self.mse(y[i], output)
 
-                    # update adam variables
-                    self.layers[j].m_W = self.betas[0] * self.layers[j].m_W + (1 - self.betas[0]) * dW
-                    self.layers[j].m_B = self.betas[0] * self.layers[j].m_B + (1 - self.betas[0]) * dB
-                    self.layers[j].v_W = self.betas[1] * self.layers[j].v_W + (1 - self.betas[1]) * (dW**2)
-                    self.layers[j].v_B = self.betas[1] * self.layers[j].v_B + (1 - self.betas[1]) * (dB**2)
-                    # bias correction
-                    m_W1_hat = self.layers[j].m_W  / (1 - self.betas[0]**(i+1))
-                    m_B1_hat = self.layers[j].m_B / (1 - self.betas[0]**(i+1))
-               
-                    v_W1_hat = self.layers[j].v_W  / (1 - self.betas[1]**(i+1))
-                    v_B1_hat =self.layers[j].v_B / (1 - self.betas[1]**(i+1))
-                  
-                    self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat) + self.epsilon)
-                    self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
+                    output_grad = None
+                    for j in range(len(self.layers)-1, -1, -1):
+                        if j == len(self.layers) - 1:
+                            if not self.classification:
+                                output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                            else:
+                                output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        else:
+                            output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+                        dW = np.dot(input[j].T, output_grad.T)
+                        dB = output_grad
+
+                        # update adam variables
+                        self.layers[j].m_W = self.betas[0] * self.layers[j].m_W + (1 - self.betas[0]) * dW
+                        self.layers[j].m_B = self.betas[0] * self.layers[j].m_B + (1 - self.betas[0]) * dB
+                        self.layers[j].v_W = self.betas[1] * self.layers[j].v_W + (1 - self.betas[1]) * (dW**2)
+                        self.layers[j].v_B = self.betas[1] * self.layers[j].v_B + (1 - self.betas[1]) * (dB**2)
+                        # bias correction
+                        m_W1_hat = self.layers[j].m_W  / (1 - self.betas[0]**(i+1))
+                        m_B1_hat = self.layers[j].m_B / (1 - self.betas[0]**(i+1))
+                
+                        v_W1_hat = self.layers[j].v_W  / (1 - self.betas[1]**(i+1))
+                        v_B1_hat =self.layers[j].v_B / (1 - self.betas[1]**(i+1))
+                    
+                        self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat) + self.epsilon)
+                        self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
             self.history.append(float(loss[0]))
-
-    
 
     def sgd_momentum(self, x, y):
         for epoch in range(self.epochs):
@@ -95,12 +136,19 @@ class Model:
                 output, output_deactivated, input = self.forward(x[i])
             
                 # Backpropagation
-                loss = self.mse(y[i], output)
+                loss = None
+                if self.classification:
+                    loss = self.cross_entropy(y[i], output)
+                else:
+                    loss = self.mse(y[i], output)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                        if not self.classification:
+                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                        else:
+                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
@@ -122,12 +170,19 @@ class Model:
                 output, output_deactivated, input = self.forward(x[i])
 
                 # Backpropagation
-                loss = self.mse(y[i], output)
-                output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                loss = None
+                if self.classification:
+                    loss = self.cross_entropy(y[i], output)
+                else:
+                    loss = self.mse(y[i], output)
+                output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                        if not self.classification:
+                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
+                        else:
+                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
@@ -168,8 +223,9 @@ class Model:
                 output = (np.dot(input, self.layers[j].weights) + self.layers[j].bias) 
                 output_activated = self.layers[j].get_activation(output)
                 input = output_activated
-                if len(output_activated) == 1:
+                if len(output_activated[0]) == 1:
                     output_activated = np.sum(output_activated)
+                
             predictions.append(output_activated)
 
 
@@ -177,9 +233,10 @@ class Model:
 
 
 class Layer:
-    def __init__(self, activation="linear", input_shape=1, output_shape=1, beta=0.9):
+    def __init__(self, activation="linear", input_shape=1, output_shape=1):
         self.activation = activation
         self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
+    
         self.bias = np.zeros((1, output_shape)) 
         # for adam 
         self.m_W, self.m_B = 0, 0
@@ -204,8 +261,12 @@ class Layer:
         
         elif self.activation == "tanh":
             return np.tanh(x)
+        
+        elif self.activation == "softmax":
+            e_x = np.exp(x - np.max(x))  # Avoid numerical instability by subtracting the maximum value
+            return e_x / e_x.sum(axis=-1, keepdims=True)
 
-        raise ValueError
+        raise ValueError("Invalid Activation ")
 
 
 
@@ -225,4 +286,11 @@ class Layer:
         
         elif self.activation == "tanh":
             return 1.0 - np.tanh(x)**2
+        
+        elif self.activation == "softmax":
+            softmax_probs = self.get_activation(x)
+            d_softmax = softmax_probs * (1 - softmax_probs)
+            return d_softmax
+        
+
         
