@@ -31,18 +31,19 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.01, optimizer="sgd_adaptive", classification=True)
+model = Model(learning_rate=0.0000033, optimizer="sgd_adaptive", classification=True)
 #model.momentum = 0.3
 
 model.layers.append(Layer("tanh", 4, 5))
 model.layers.append(Layer("tanh", 5, 3))
-model.layers.append(Layer("softmax", 3, 3))
+model.layers.append(Layer("linear", 3, 3))
 
 
 model.compile(x_train, y_train)
 
 predictions = model.fit(x_test, y_test)
-predicted_classes = np.argmax(np.array([arr[0] for arr in predictions]), axis=1)
+
+predicted_classes = np.round(np.argmax(np.array([arr[0] for arr in predictions]), axis=1))
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
 plt.plot(y_test, color='red', label='Actual')
