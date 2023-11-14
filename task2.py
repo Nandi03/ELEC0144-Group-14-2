@@ -31,7 +31,7 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.1, optimizer="sgd", classification=False)
+model = Model(learning_rate=0.01, optimizer="adam")
 #model.momentum = 0.3
 
 model.layers.append(Layer("tanh", 4, 5))
@@ -42,12 +42,11 @@ model.layers.append(Layer("linear", 3, 3))
 model.compile(x_train, y_train)
 
 predictions = model.fit(x_test, y_test)
-
-predicted_classes = np.round(np.argmax(np.array([arr[0] for arr in predictions]), axis=1))
+predictions = [round(max(arr[0])) for arr in predictions]
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
 plt.plot(y_test, color='red', label='Actual')
-plt.plot(predicted_classes, color='blue', label="Predicted")
+plt.plot(predictions, color='blue', label="Predicted")
 plt.xlabel('Sample Number')
 plt.ylabel('Class')
 plt.title('Classification results')
@@ -55,7 +54,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-error = y_test - predicted_classes
+error = y_test - predictions
 plt.figure(figsize=(8, 6))
 plt.plot(error,  color='red', label='Error')
 plt.xlabel('Sample Number')

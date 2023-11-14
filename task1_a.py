@@ -27,10 +27,10 @@ l2_bias = np.zeros((1, output_size))  # Bias for output layer
 
 
 # Learning rate
-learning_rate = 0.01
+learning_rate = 0.1
 
 # Number of epochs
-epochs = 2000
+epochs = 1000
 
 # Generate some random training data
 x_train = np.arange(-1, 1, 0.05)
