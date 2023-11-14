@@ -46,7 +46,7 @@ dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset)}
 class_names = full_dataset.classes
 
 # Load pre-trained GoogLeNet
-model = models.googlenet(pretrained=True)
+model = models.googlenet(weights="GoogLeNet_Weights.DEFAULT")
 # Change the output layer to match the number of classes
 num_fruits = len(class_names)
 model.fc = nn.Linear(model.fc.in_features, num_fruits)
