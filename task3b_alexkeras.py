@@ -35,12 +35,12 @@ train_datagen = ImageDataGenerator(rescale=1./255,
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
-train_generator = train_datagen.flow_from_directory('train',
+train_generator = train_datagen.flow_from_directory('task3data/train',
                                                     target_size=(227, 227),
                                                     batch_size=5,
                                                     class_mode='categorical')
 
-validation_generator = test_datagen.flow_from_directory('validation',
+validation_generator = test_datagen.flow_from_directory('task3data/test',
                                                         target_size=(227, 227),
                                                         batch_size=5,
                                                         class_mode='categorical')
