@@ -79,7 +79,7 @@ class Model:
                     self.layers[j].weights -= self.learning_rate * np.outer(input[j], output_grad) 
                     self.layers[j].bias -= self.learning_rate * output_grad
 
-            self.history.append(float(loss[0]))
+            #self.history.append(float(loss[0]))
     
     def softmax(self, x):
         e_x = np.exp(x - np.max(x))  # Avoid numerical instability by subtracting the maximum value
@@ -194,7 +194,7 @@ class Model:
                     self.layers[j].weights -= (self.learning_rate / (np.sqrt(self.layers[j].velocity) + self.epsilon)) * np.outer(input[j], output_grad)
                     self.layers[j].bias -= (self.learning_rate / (np.sqrt(self.layers[j].bias_velocity) + self.epsilon)) * output_grad
 
-            self.history.append(float(loss[0]))
+            #self.history.append(float(loss[0]))
 
     def forward(self, x):
         # Forward pass
