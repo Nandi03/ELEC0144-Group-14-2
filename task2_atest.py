@@ -1,6 +1,10 @@
 from network import Model, Layer
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+
+# Read the CSV-style text file into a DataFrame
+data = pd.read_csv('IrisData.txt')
 
 np.random.seed(0)
 model = Model(learning_rate=0.1, optimizer="sgd")

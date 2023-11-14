@@ -59,19 +59,18 @@ class Model:
                 # backpropagation
                 loss = None
                 if self.classification:
-                    softmax_output = self.softmax(output)
                     loss = self.cross_entropy(y[i], output)
                 else:
                     loss = self.mse(y[i], output)
                                     
                 output_grad = None
-    
+
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
                         if not self.classification:
                             output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
                         else:
-                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                            output_grad = output - y[i]
 
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
@@ -80,6 +79,7 @@ class Model:
                     self.layers[j].bias -= self.learning_rate * output_grad
 
             self.history.append(float(loss[0]))
+
     
     def softmax(self, x):
         e_x = np.exp(x - np.max(x))  # Avoid numerical instability by subtracting the maximum value
