@@ -18,8 +18,7 @@ d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal
 model.compile(x_train, d_train)
 
 x_test = np.arange(-0.97, 0.93, 0.1)
-y_test = 0.8* x_test**3 + 0.3 * x_test**2 - 0.4*x_test + np.random.normal(0, 0.02, len(x_test))
-
+y_test = 0.8* x_test**3 + 0.3 * x_test**2 - 0.4*x_test 
 predictions = model.fit(x_test, y_test)
 
  # Plot the training data, true cubic function, and predictions

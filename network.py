@@ -34,7 +34,7 @@ class Model:
         - an array updated every 100 epochs with the training loss
     
     '''
-    def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd", classification=False) -> None:
+    def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd") -> None:
         '''
         Create a neural network.
         Intialised with no layers. Append new layers in the order from input layer to output layer to array 'layers'.
@@ -47,22 +47,6 @@ class Model:
         self.betas = [0.9, 0.99]
         self.epsilon = 1e-8
         self.momentum = 0.5 # a constant between 0 and 1
-        self.classification = classification
-
-    def cross_entropy(self, actual, predicted):
-        loss_sum = 0
-        for i in range(len(predicted)):
-            y_pred = max(self.epsilon, min(1 - self.epsilon, predicted[0][i]))
-            loss_sum += -(actual * math.log(y_pred))  
-        return [loss_sum]
-
-    def cross_entropy_grad(self, actual, predicted):
-        grad_sum = 0
-        for i in range(len(predicted)):
-            y_pred = max(self.epsilon, min(1 - self.epsilon, predicted[0][i]))
-            grad_sum += -(actual /y_pred) 
-        return [grad_sum]
-    
 
     def compile(self, x, y):
         if self.optimizer == "sgd":
@@ -81,20 +65,13 @@ class Model:
                 output, output_deactivated, input = self.forward(x[i])
             
                 # backpropagation
-                loss = None
-                if self.classification:
-                    loss = self.cross_entropy(y[i], output)
-                else:
-                    loss = self.mse(y[i], output)
+                loss = self.mse(y[i], output)
                                     
                 output_grad = None
     
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if not self.classification:
-                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
-                        else:
-                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
@@ -111,20 +88,13 @@ class Model:
                 output, output_deactivated, input = self.forward(x[i])
 
                 # Back propagation
-                loss = None
-                if self.classification:
-                    loss = self.cross_entropy(y[i], output)
-                else:
-                    loss = self.mse(y[i], output)
+                loss = self.mse(y[i], output)
 
                 output_grad = None
 
                 for j in range(len(self.layers)-1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if not self.classification:
-                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
-                        else:
-                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
                   
@@ -154,19 +124,12 @@ class Model:
                 output, output_deactivated, input = self.forward(x[i])
             
                 # Backpropagation
-                loss = None
-                if self.classification:
-                    loss = self.cross_entropy(y[i], output)
-                else:
-                    loss = self.mse(y[i], output)
+                loss = self.mse(y[i], output)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if not self.classification:
-                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
-                        else:
-                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
@@ -188,19 +151,12 @@ class Model:
                 output, output_deactivated, input = self.forward(x[i])
 
                 # Backpropagation
-                loss = None
-                if self.classification:
-                    loss = self.cross_entropy(y[i], output)
-                else:
-                    loss = self.mse(y[i], output)
+                loss = self.mse(y[i], output)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if not self.classification:
-                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
-                        else:
-                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
                     
@@ -299,6 +255,7 @@ class Layer:
         
         elif self.activation == "tanh":
             return 1.0 - np.tanh(x)**2
+        
         
 
         
