@@ -1,100 +1,65 @@
+from network import Model, Layer
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Read the CSV-style text file into a DataFrame
-data = pd.read_csv('IrisData.txt')
+np.random.seed(40)
 
-# Activation functions and their derivatives
-def tanh(x):
-    return np.tanh(x)
+# Read data from the text file into a pandas DataFrame
+data = pd.read_csv('IrisData.txt', header=None, names=['col1', 'col2', 'col3', 'col4', 'class'])
 
-def tanh_derivative(x):
-    return 1.0 - np.tanh(x)**2
+# Create a mapping between unique string labels and integers
+label_to_int = {label: idx for idx, label in enumerate(data['class'].unique())}
 
-def mse(actual, predicted):
-    return 0.5 * ((predicted- actual)**2)
+# Map string labels to integers and create a new column 'class_int' in the DataFrame
+data['class_int'] = data['class'].map(label_to_int)
 
-def mse_grad(actual, predicted):
-    return predicted - actual
+# Extract numerical features and integer labels
+data_x = np.array(data[['col1', 'col2', 'col3', 'col4']].values)
+data_y = np.array(data['class_int'].values)
 
-# Initialize weights randomly
-np.random.seed(42)
-input_size = 4
-hidden_size_1 = 5
-hidden_size_2 = 3
-output_size = 3
+combined_data = list(zip(data_x, data_y))
+np.random.shuffle(combined_data)
+data_x, data_y = zip(*combined_data)
+data_x= np.array(data_x)
+data_y = np.array(data_y)
 
-l1_weights = np.random.randn(input_size, hidden_size_1) * np.sqrt(2 / (input_size + hidden_size_1))
-l1_bias = np.zeros((1, hidden_size_1))  # Bias for hidden layer 1
+total_samples = len(data_x)
+train_size = int(0.7 * total_samples)
 
-l2_weights = np.random.randn(hidden_size_1,hidden_size_2) * np.sqrt(2 / (hidden_size_1 + hidden_size_2))
-l2_bias = np.zeros((1, hidden_size_2))  # Bias for hidden layer 2
+# Splitting the data into training and testing sets
+x_train, x_test = data_x[:train_size], data_x[train_size:]
+y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-l3_weights = np.random.randn(hidden_size_2, output_size) * np.sqrt(2 / (hidden_size_2 + output_size))
-l3_bias = np.zeros((1, output_size))  # Bias for output layer
+model = Model(learning_rate=0.001, optimizer="sgd")
+#model.momentum = 0.3
 
-# Learning rate
-learning_rate = 0.1
-
-# Number of epochs
-epochs = 1000
-
-# Training the neural network using stochastic gradient descent
-for epoch in range(epochs):
-    # Iterate through each training example
-    epoch_loss = 0
-    for i in range(len(x_train)):
-        # Forward pass
-        l1_output =  np.dot(x_train[i], l1_weights) + l1_bias # Layer 1
-        l1_activated = np.tanh(l1_output) # Apply tanh activation func
-        output = np.dot(l1_activated, l2_weights) + l2_bias # Layer 2
-
-        # Compute loss
-        loss = mse(d_train[i], output)
-
-        # Back-propagation
-        output_grad = mse_grad(d_train[i], output)
-        l1_output_grad = np.dot(output_grad, l2_weights.T) * tanh_derivative(l1_output)
-
-        # update weights using gradient descent
-        l1_weights -= learning_rate * np.outer(x_train[i], l1_output_grad)
-        l1_bias -= learning_rate * l1_output_grad
-        
-        l2_weights -= learning_rate * np.outer(l1_activated, output_grad)
-        l2_bias -= learning_rate * output_grad
-
-        l3_weights -= learning_rate * np.outer(l1_activated, output_grad)
-        l3_bias -= learning_rate * output_grad
-
-        # Compute individual sample loss
-        sample_loss = 0.5 * ((output - d_train[i])**2)
-
-        # Accumulate sample loss to calculate mean loss for the epoch
-        epoch_loss += sample_loss
-     # Print loss every 100 epochs
-    mean_epoch_loss = np.mean(epoch_loss)
-
-    if epoch % 100 == 0:
-        print(f'Epoch: {epoch}, Mean Loss: {mean_epoch_loss:.6f}')
+model.layers.append(Layer("tanh", 4, 5))
+model.layers.append(Layer("tanh", 5, 3))
+model.layers.append(Layer("linear", 3, 3))
 
 
-x_test = np.arange(-0.97, 0.93, 0.1)
-y_test = 0.8* x_test**3 + 0.3 * x_test**2 - 0.4*x_test + np.random.normal(0, 0.02, len(x_test))
-predictions = []
-for i in range(len(x_test)):
-    l1_input = np.dot(x_test[i], l1_weights) + l1_bias
-    l1_activated = np.tanh(l1_input)
-    output = np.sum(np.dot(l1_activated, l2_weights) + l2_bias)
-    predictions.append(output)
+model.compile(x_train, y_train)
 
+predictions = model.fit(x_test, y_test)
+predictions = [round(max(arr[0])) for arr in predictions]
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
-plt.scatter(x_test, y_test, color='blue', label='Training Data')
-plt.plot(x_test, predictions, color='red', marker='o', linestyle='dashed', linewidth=2, markersize=8, label='Predictions')
-plt.xlabel('X_test')
-plt.ylabel('Y')
-plt.title('Cubic Function Approximation using Neural Network (Sequential Learning)')
+plt.plot(y_test, color='red', label='Actual')
+plt.plot(predictions, color='blue', label="Predicted")
+plt.xlabel('Sample Number')
+plt.ylabel('Class')
+plt.title('Classification results')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+error = y_test - predictions
+plt.figure(figsize=(8, 6))
+plt.plot(error,  color='red', label='Error')
+plt.xlabel('Sample Number')
+plt.ylabel('Error')
+plt.title('Error')
 plt.legend()
 plt.grid(True)
 plt.show()
