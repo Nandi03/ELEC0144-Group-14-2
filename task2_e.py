@@ -31,8 +31,7 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.01, optimizer="adam")
-#model.momentum = 0.3
+model = Model(learning_rate=0.001, optimizer="adam")
 
 model.layers.append(Layer("tanh", 4, 5))
 model.layers.append(Layer("tanh", 5, 3))
