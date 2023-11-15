@@ -34,7 +34,7 @@ class Model:
         - an array updated every 100 epochs with the training loss
     
     '''
-    def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd") -> None:
+    def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd", one_hot=False) -> None:
         '''
         Create a neural network.
         Intialised with no layers. Append new layers in the order from input layer to output layer to array 'layers'.
@@ -47,6 +47,7 @@ class Model:
         self.betas = [0.9, 0.99]
         self.epsilon = 1e-8
         self.momentum = 0.5 # a constant between 0 and 1
+        self.one_hot = one_hot
 
     def compile(self, x, y):
         ''' Call the training algorithm for the corresponding optimizer'''
@@ -75,7 +76,7 @@ class Model:
     
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
@@ -101,7 +102,7 @@ class Model:
 
                 for j in range(len(self.layers)-1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
                   
@@ -140,7 +141,7 @@ class Model:
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
@@ -171,7 +172,7 @@ class Model:
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
                     
@@ -221,6 +222,11 @@ class Model:
         > derivative of squared error as float(s)
         
         '''
+        one_hot = None
+        if self.one_hot:
+            one_hot = np.zeros_like(predicted[0])
+            one_hot[actual] = 1
+        actual = [one_hot]
         return 0.5 * ((predicted- actual)**2)
 
     def mse_grad(self, actual, predicted):
@@ -234,7 +240,12 @@ class Model:
         returns:
         > derivative of squared error as float(s)
 
-        '''
+        ''' 
+        one_hot = None
+        if self.one_hot:
+            one_hot = np.zeros_like(predicted[0])
+            one_hot[actual] = 1
+        actual = [one_hot]
         
         return predicted - actual
 
