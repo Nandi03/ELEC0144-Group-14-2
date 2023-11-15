@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
+from torchvision.models import Inception_V3_Weights
 
 # Set random seed for reproducibility
 torch.manual_seed(42)
@@ -23,7 +24,7 @@ val_dataset = datasets.ImageFolder('task3data/test', transform=transform)
 val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
 # Load pre-trained GoogleNet (Inception)
-googlenet = models.inception_v3(pretrained=True)
+googlenet = models.inception_v3(weights=Inception_V3_Weights.DEFAULT)
 
 # Modify the classifier
 num_fruit_classes = 5

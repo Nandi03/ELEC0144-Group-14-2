@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
+from torchvision.models import AlexNet_Weights
+
 
 # Set random seed for reproducibility
 torch.manual_seed(42)
@@ -23,7 +25,7 @@ val_dataset = datasets.ImageFolder('task3data/test', transform=transform)
 val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
 # Load pre-trained AlexNet
-alexnet = models.alexnet(pretrained=True)
+alexnet = models.alexnet(weights=AlexNet_Weights.DEFAULT)
 
 # Modify the classifier
 num_fruit_classes = 5
