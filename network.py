@@ -1,8 +1,5 @@
 import numpy as np
-import math
-from tsensor import explain as exp
 
-np.random.seed(0)
 class Model:
     '''
     Implements functions to create and train a neural network.
@@ -24,6 +21,8 @@ class Model:
     > Adam = "adam"
     
     Other Attributes:
+    > layers = []
+        - An array of Layer instances. Append new Layers in the order required for the neural network. 
     > betas = [0.9, 0.99]
          - used for training methods Adam, sgd-adaptive
     > epsilon = 1e-8
@@ -32,6 +31,7 @@ class Model:
         - used for sgd-momentum
     > history
         - an array updated every 100 epochs with the training loss
+    
     
     '''
     def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd", one_hot=False) -> None:
@@ -299,12 +299,13 @@ class Layer:
     :param activation: str - set to 'linear' by default. Other activation functions include: tanh, sigmoid, ReLu and Leaky ReLu.
     :param input_shape: int - input shape of the input layer should match the dimension of the input. For other layers, input shape should match the output shape of previous layer.
     :param output_shape: int - output shape of the output layer should match the dimension of the output. For the layers, the output shape should match the input shape of the next layer.
-    
+    :param seed: int - seed value for the np.random.seed() used to ensure reproducibility; has a default value of 42.
     '''
-    def __init__(self, activation="linear", input_shape=1, output_shape=1):
+    def __init__(self, activation="linear", input_shape=1, output_shape=1, seed=42):
         '''
         Initialise a layer with attributes; activation, input_shape and output_shape
         '''
+        np.random.seed(seed)
         self.activation = activation
         self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
         self.bias = np.zeros((1, output_shape)) 
