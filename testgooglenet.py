@@ -54,24 +54,24 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
 
-    # Validation
-    googlenet.eval()
-    val_loss = 0.0
-    correct = 0
-    total = 0
+# Validation
+googlenet.eval()
+val_loss = 0.0
+correct = 0
+total = 0
 
-    with torch.no_grad():
-        for inputs, labels in val_loader:
-            inputs, labels = inputs.to(device), labels.to(device)
-            outputs, _ = googlenet(inputs)  # Use only the final logits for validation
-            loss = criterion(outputs, labels)
-            val_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += labels.size(0)
-            correct += predicted.eq(labels).sum().item()
+with torch.no_grad():
+    for inputs, labels in val_loader:
+        inputs, labels = inputs.to(device), labels.to(device)
+        outputs, _ = googlenet(inputs)  # No auxiliary outputs during validation
+        loss = criterion(outputs, labels)
+        val_loss += loss.item()
+        _, predicted = outputs.max(1)
+        total += labels.size(0)
+        correct += predicted.eq(labels).sum().item()
 
-    accuracy = 100 * correct / total
-    print(f'Epoch {epoch + 1}/{num_epochs}, Loss: {val_loss / len(val_loader)}, Accuracy: {accuracy}%')
+accuracy = 100 * correct / total
+print(f'Epoch {epoch + 1}/{num_epochs}, Loss: {val_loss / len(val_loader)}, Accuracy: {accuracy}%')
 
 # Save the trained model
 torch.save(googlenet.state_dict(), 'fruit_classifier_googlenet.pth')
