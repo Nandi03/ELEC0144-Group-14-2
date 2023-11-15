@@ -2,8 +2,8 @@ from network import Model, Layer
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(42)
-model = Model(epochs=1000,learning_rate=0.1, optimizer="sgd")
+np.random.seed(0)
+model = Model(learning_rate=0.01, optimizer="adam")
 #model.momentum = 0.3
 
 model.layers.append(Layer("sigmoid", 1, 3))
