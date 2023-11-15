@@ -41,7 +41,7 @@ model.layers.append(Layer("tanh", 5, 3))
 model.layers.append(Layer("linear", 3, 3))
 
 
-model.compile(x_train, y_train)
+model.compile(x_train)
 
 predictions = model.fit(x_test, y_test)
 predictions = [round(max(arr[0])) for arr in predictions]

@@ -41,7 +41,7 @@ model.layers.append(Layer("linear", 3, 3))
 
 model.compile(x_train, y_train)
 
-predictions = model.fit(x_test, y_test)
+predictions = model.fit(x_test)
 predictions = [round(max(arr[0])) for arr in predictions]
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
