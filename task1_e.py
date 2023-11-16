@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 np.random.seed(0)
-model = Model(learning_rate=0.01, optimizer="adam")
+model = Model(learning_rate=0.0042, optimizer="adam")
 #model.momentum = 0.3
 
-model.layers.append(Layer("sigmoid", 1, 3))
+model.layers.append(Layer("tanh", 1, 3))
 model.layers.append(Layer("linear", 3, 1))
 
 x_train = np.arange(-1, 1, 0.05)

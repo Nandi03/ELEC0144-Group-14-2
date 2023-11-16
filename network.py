@@ -34,7 +34,7 @@ class Model:
     
     
     '''
-    def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd", one_hot=False) -> None:
+    def __init__(self, epochs=2000, learning_rate=0.1, optimizer="sgd", one_hot=False) -> None:
         '''
         Create a neural network.
         Intialised with no layers. Append new layers in the order from input layer to output layer to array 'layers'.
