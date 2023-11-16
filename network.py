@@ -1,5 +1,5 @@
 import numpy as np
-np.random.seed(0)
+np.random.seed(42)
 
 class Model:
     '''
@@ -302,11 +302,10 @@ class Layer:
     :param output_shape: int - output shape of the output layer should match the dimension of the output. For the layers, the output shape should match the input shape of the next layer.
     :param seed: int - seed value for the np.random.seed() used to ensure reproducibility; has a default value of 42.
     '''
-    def __init__(self, activation="linear", input_shape=1, output_shape=1, seed=42):
+    def __init__(self, activation="linear", input_shape=1, output_shape=1):
         '''
         Initialise a layer with attributes; activation, input_shape and output_shape
         '''
-        np.random.seed(seed)
         self.activation = activation
         self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
         self.bias = np.zeros((1, output_shape)) 
