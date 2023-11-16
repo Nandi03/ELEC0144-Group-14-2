@@ -226,7 +226,7 @@ class Model:
         if self.one_hot:
             one_hot = np.zeros_like(predicted[0])
             one_hot[actual] = 1
-        actual = [one_hot]
+            actual = [one_hot]
         return 0.5 * ((predicted- actual)**2)
 
     def mse_grad(self, actual, predicted):
@@ -245,7 +245,7 @@ class Model:
         if self.one_hot:
             one_hot = np.zeros_like(predicted[0])
             one_hot[actual] = 1
-        actual = [one_hot]
+            actual = [one_hot]
         
         return predicted - actual
 
