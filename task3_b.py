@@ -19,10 +19,10 @@ transform = transforms.Compose([
 
 # Load the data
 train_dataset = datasets.ImageFolder('task3data/train', transform=transform)
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=5, shuffle=True)
 
 val_dataset = datasets.ImageFolder('task3data/test', transform=transform)
-val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+val_loader = DataLoader(val_dataset, batch_size=5, shuffle=False)
 
 # Load pre-trained AlexNet
 alexnet = models.alexnet(weights=AlexNet_Weights.DEFAULT)
