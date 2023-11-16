@@ -41,10 +41,11 @@ model.layers.append(Layer("tanh", 5, 3))
 model.layers.append(Layer("linear", 3, 3))
 
 
-model.compile(x_train, y_train)
+model.compile(x_train)
 
 predictions = model.fit(x_test, y_test)
-predictions = [round(max(arr[0])) for arr in predictions]
+predictions = np.argmax(np.array([arr[0] for arr in predictions]), axis=1) # use this when using one-hot encoding
+#predictions = [argmax(max(arr[0])) for arr in predictions] # use this when not using one-hot encoding.
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
 plt.plot(y_test, color='red', label='Actual')
@@ -115,7 +116,8 @@ model.layers.append(Layer("linear", 3, 3))
 model.compile(x_train, y_train)
 
 predictions = model.fit(x_test, y_test)
-predictions = [round(max(arr[0])) for arr in predictions]
+#predictions = np.argmax(np.array([arr[0] for arr in predictions]), axis=1) # use this when using one-hot encoding
+predictions = [round(max(arr[0])) for arr in predictions] # use this when not using one-hot encoding.
 # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
 plt.plot(y_test, color='red', label='Actual')

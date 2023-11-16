@@ -1,8 +1,5 @@
 import numpy as np
-import math
-from tsensor import explain as exp
 
-np.random.seed(0)
 class Model:
     '''
     Implements functions to create and train a neural network.
@@ -24,6 +21,8 @@ class Model:
     > Adam = "adam"
     
     Other Attributes:
+    > layers = []
+        - An array of Layer instances. Append new Layers in the order required for the neural network. 
     > betas = [0.9, 0.99]
          - used for training methods Adam, sgd-adaptive
     > epsilon = 1e-8
@@ -33,8 +32,9 @@ class Model:
     > history
         - an array updated every 100 epochs with the training loss
     
+    
     '''
-    def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd", classification=False) -> None:
+    def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd", one_hot=False) -> None:
         '''
         Create a neural network.
         Intialised with no layers. Append new layers in the order from input layer to output layer to array 'layers'.
@@ -47,24 +47,10 @@ class Model:
         self.betas = [0.9, 0.99]
         self.epsilon = 1e-8
         self.momentum = 0.5 # a constant between 0 and 1
-        self.classification = classification
-
-    def cross_entropy(self, actual, predicted):
-        loss_sum = 0
-        for i in range(len(predicted)):
-            y_pred = max(self.epsilon, min(1 - self.epsilon, predicted[0][i]))
-            loss_sum += -(actual * math.log(y_pred))  
-        return [loss_sum]
-
-    def cross_entropy_grad(self, actual, predicted):
-        grad_sum = 0
-        for i in range(len(predicted)):
-            y_pred = max(self.epsilon, min(1 - self.epsilon, predicted[0][i]))
-            grad_sum += -(actual /y_pred) 
-        return [grad_sum]
-    
+        self.one_hot = one_hot
 
     def compile(self, x, y):
+        ''' Call the training algorithm for the corresponding optimizer'''
         if self.optimizer == "sgd":
            self.sgd(x, y)
         if self.optimizer == "adam":
@@ -75,35 +61,34 @@ class Model:
             self.sgd_adaptive(x, y)
 
     def sgd(self, x, y):
+        '''
+        Train the model using Stochastic Gradient Descent.
+        '''
         for epoch in range(self.epochs):
             for i in range(len(x)):
                 # Forward pass
                 output, output_deactivated, input = self.forward(x[i])
             
                 # backpropagation
-                loss = None
-                if self.classification:
-                    loss = self.cross_entropy(y[i], output)
-                else:
-                    loss = self.mse(y[i], output)
+                loss = self.mse(y[i], output)
                                     
                 output_grad = None
     
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if not self.classification:
-                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
-                        else:
-                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
                     self.layers[j].weights -= self.learning_rate * np.outer(input[j], output_grad) 
                     self.layers[j].bias -= self.learning_rate * output_grad
-
+            # Append loss every 100 epochs for plotting and tracking learning progress
             self.history.append(float(np.sum(loss)))
 
     def adam(self, x, y):
+        '''
+        Train the model using Adam.
+        '''
         if len(self.betas) != 2:
             raise IndexError
         for epoch in range(self.epochs):
@@ -111,20 +96,13 @@ class Model:
                 output, output_deactivated, input = self.forward(x[i])
 
                 # Back propagation
-                loss = None
-                if self.classification:
-                    loss = self.cross_entropy(y[i], output)
-                else:
-                    loss = self.mse(y[i], output)
+                loss = self.mse(y[i], output)
 
                 output_grad = None
 
                 for j in range(len(self.layers)-1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if not self.classification:
-                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
-                        else:
-                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
                   
@@ -145,28 +123,25 @@ class Model:
                 
                     self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat) + self.epsilon)
                     self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
+            # Append loss every 100 epochs for plotting and tracking learning progress
             self.history.append(float(np.sum(loss)))
 
     def sgd_momentum(self, x, y):
+        '''
+        Train the model using Stochastic Gradient Descent with Momentum.
+        '''
         for epoch in range(self.epochs):
             for i in range(len(x)):
                 # Forward pass
                 output, output_deactivated, input = self.forward(x[i])
             
                 # Backpropagation
-                loss = None
-                if self.classification:
-                    loss = self.cross_entropy(y[i], output)
-                else:
-                    loss = self.mse(y[i], output)
+                loss = self.mse(y[i], output)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if not self.classification:
-                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
-                        else:
-                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
 
@@ -178,29 +153,26 @@ class Model:
                     self.layers[j].weights -= self.layers[j].velocity
                     self.layers[j].bias -= self.layers[j].bias_velocity
 
+            # Append loss every 100 epochs for plotting and tracking learning progress
             self.history.append(float(np.sum(loss)))
 
         
     def sgd_adaptive(self, x, y):
+        '''
+        Train the model using Stochastic Gradient Descent with Adaptive Learning Rate.
+        '''
         for epoch in range(self.epochs):
             for i in range(len(x)):
                 # Forward pass
                 output, output_deactivated, input = self.forward(x[i])
 
                 # Backpropagation
-                loss = None
-                if self.classification:
-                    loss = self.cross_entropy(y[i], output)
-                else:
-                    loss = self.mse(y[i], output)
+                loss = self.mse(y[i], output)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        if not self.classification:
-                            output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])
-                        else:
-                            output_grad = self.cross_entropy_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
                     
@@ -211,10 +183,22 @@ class Model:
                     # Update weights and biases using Adagrad
                     self.layers[j].weights -= (self.learning_rate / (np.sqrt(self.layers[j].velocity) + self.epsilon)) * np.outer(input[j], output_grad)
                     self.layers[j].bias -= (self.learning_rate / (np.sqrt(self.layers[j].bias_velocity) + self.epsilon)) * output_grad
-
+            # Append loss every 100 epochs for plotting and tracking learning progress
             self.history.append(float(np.sum(loss)))
 
     def forward(self, x):
+        ''' 
+        Run the forward propagation
+
+        Parameters:
+        x: a value(s) of type float
+        
+        Returns:
+        > the output at each layer as an array
+        > the output without activation function at each layer as an array
+        > the input to each layer 
+        
+        '''
         # Forward pass
         output = None
         output_deactivated = []
@@ -227,12 +211,55 @@ class Model:
         return output, output_deactivated, input
     
     def mse(self, actual, predicted):
+        ''' 
+        Calculate and return the squared error
+
+        Parameters:
+        > actual: the actual (true) output(s) as float(s)
+        > predicted: the predicted value(s) as float(s)
+        
+        return:
+        > derivative of squared error as float(s)
+        
+        '''
+        one_hot = None
+        if self.one_hot:
+            one_hot = np.zeros_like(predicted[0])
+            one_hot[actual] = 1
+        actual = [one_hot]
         return 0.5 * ((predicted- actual)**2)
 
     def mse_grad(self, actual, predicted):
+        ''' 
+        Calculate and return the derivative of the squared error wrt to the loss function
+        
+        Parameters:
+        > actual: the actual (true) output(s) as float(s)
+        > predicted: the predicted value(s) as float(s)
+        
+        returns:
+        > derivative of squared error as float(s)
+
+        ''' 
+        one_hot = None
+        if self.one_hot:
+            one_hot = np.zeros_like(predicted[0])
+            one_hot[actual] = 1
+        actual = [one_hot]
+        
         return predicted - actual
 
-    def fit(self, x, y):
+    def fit(self, x):
+        ''' 
+        Given x-values from a testing data set, predicts the y-values using the model after training.
+
+        Parameters:
+        > x: an array of the testing values compatible with the model
+        
+        returns:
+        > An array of the predictions (output)
+
+        '''
         predictions = []
         for i in range(len(x)):
             input = x[i]
@@ -251,7 +278,34 @@ class Model:
 
 
 class Layer:
-    def __init__(self, activation="linear", input_shape=1, output_shape=1):
+    '''
+    Instantiates a Layer which can be used to create the neural network in the Model class.
+
+    Features layers with 4 different activation functions:
+
+    > sigmoid function
+        - set activation to 'sigmoid'
+    > tanh function
+        - set activation to 'tanh'
+    > linear function 
+        - set activation to 'linear'
+    > leaky ReLu
+        - set activation to 'leaky_relu'
+    > ReLu
+        - set activation to 'relu'
+
+    Using an activation function other than these will cause a ValueError.
+
+    :param activation: str - set to 'linear' by default. Other activation functions include: tanh, sigmoid, ReLu and Leaky ReLu.
+    :param input_shape: int - input shape of the input layer should match the dimension of the input. For other layers, input shape should match the output shape of previous layer.
+    :param output_shape: int - output shape of the output layer should match the dimension of the output. For the layers, the output shape should match the input shape of the next layer.
+    :param seed: int - seed value for the np.random.seed() used to ensure reproducibility; has a default value of 42.
+    '''
+    def __init__(self, activation="linear", input_shape=1, output_shape=1, seed=42):
+        '''
+        Initialise a layer with attributes; activation, input_shape and output_shape
+        '''
+        np.random.seed(seed)
         self.activation = activation
         self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
         self.bias = np.zeros((1, output_shape)) 
@@ -264,6 +318,16 @@ class Layer:
 
 
     def get_activation(self, x, alpha=0.1):
+        '''
+        Calculates the output using the layer's corresponding activation functions.
+
+        Parameters:
+        > x: the output value(s) of type float
+        > alpha (optional): used as the gradient for leaky ReLu
+
+        Returns:
+        > the output after activation for that layer as float(s)
+        '''
         if self.activation == "sigmoid":
             return 1 / (1 + np.exp(-x))
         
@@ -284,7 +348,17 @@ class Layer:
 
 
     def get_derivative(self, x, alpha=0.1):
+        '''
+        Calculates the derivative of the layer's corresponding activation functions.
+        Used in backpropagation for training the model.
 
+        Parameters:
+        > x: the output value(s) before activation of the layer as type float.
+        > alpha (optional): used as the gradient for leaky ReLu
+
+        Returns:
+        > the derivative wrt to the loss function for that layer as float(s)
+        '''
         if self.activation == "sigmoid":
             return self.get_activation(x) * (1 - self.get_activation(x))
         
@@ -299,6 +373,7 @@ class Layer:
         
         elif self.activation == "tanh":
             return 1.0 - np.tanh(x)**2
+        
         
 
         
