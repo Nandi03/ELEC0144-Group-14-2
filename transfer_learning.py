@@ -18,6 +18,7 @@ class TransferLearning:
         self.train_path = train_path
         self.test_path = test_path
 
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # Move to gpu if available
 
         # Data augmentation and normalization
         transform = transforms.Compose([
@@ -28,11 +29,7 @@ class TransferLearning:
         ])
 
         # Load the data
-        train_dataset = datasets.ImageFolder(train_path, transform=transform)
-        self.train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
-
-        val_dataset = datasets.ImageFolder(test_path, transform=transform)
-        self.val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
+        train_loader, val_loader = self.load_data(self.train_path, self.test_path, transform, self.batch_size)
 
         # Load pre-trained model
         if model_name == 'alexnet':
@@ -47,7 +44,6 @@ class TransferLearning:
         self.criterion = nn.CrossEntropyLoss()
 
         # Move model to device
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = self.model.to(self.device)
 
     def train(self):
@@ -85,3 +81,14 @@ class TransferLearning:
 
         accuracy = 100 * correct / total
         return accuracy
+    
+    def load_data(train_path, test_path, transform, batch_size):
+        # Load training data
+        train_dataset = datasets.ImageFolder(train_path, transform=transform)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+
+        # Load validation data
+        val_dataset = datasets.ImageFolder(test_path, transform=transform)
+        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+
+        return train_loader, val_loader
