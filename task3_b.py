@@ -32,15 +32,16 @@ num_fruit_classes = 5
 alexnet.classifier[6] = nn.Linear(4096, num_fruit_classes)
 
 # Set up optimizer and loss function
-optimizer = optim.SGD(alexnet.parameters(), lr=0.001, momentum=0.9)
+momentum=0.9
+optimizer = optim.Adam(alexnet.parameters(), lr=0.0001)
 criterion = nn.CrossEntropyLoss()
 
 # Training loop
-num_epochs = 10
+num_epochs = 100
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 alexnet = alexnet.to(device)
 
-for epoch in range(num_epochs):
+for epoch in range(1,num_epochs+1):
     alexnet.train()
     for inputs, labels in train_loader:
         inputs, labels = inputs.to(device), labels.to(device)
@@ -67,7 +68,8 @@ for epoch in range(num_epochs):
             correct += predicted.eq(labels).sum().item()
 
     accuracy = 100 * correct / total
-    print(f'Epoch {epoch + 1}/{num_epochs}, Loss: {val_loss / len(val_loader)}, Accuracy: {accuracy}%')
+    if epoch % 10 == 0:
+        print(f'Epoch {epoch}/{num_epochs}, Loss: {val_loss / len(val_loader)}, Accuracy: {accuracy}%')
 
 # Save the trained model
 torch.save(alexnet.state_dict(), 'fruit_classifier.pth')
