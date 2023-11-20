@@ -9,8 +9,10 @@ from torchvision.models import AlexNet_Weights, GoogLeNet_Weights
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, batch_size, lr, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100):
+    def __init__(self, model_name, optimiser,batch_size, lr, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9):
         self.model_name = model_name
+        self.optimizer = optimiser
+        self.criterion = criterion
         self.num_classes = num_classes
         self.batch_size = batch_size
         self.lr = lr
@@ -28,7 +30,7 @@ class TransferLearning:
         ])
 
         # Load the data
-        self.train_loader, self.val_loader = self.load_data(self.train_path, self.test_path, transform, self.batch_size)
+        self.train_loader, self.val_loader = self._load_data(self.train_path, self.test_path, transform, self.batch_size)
 
         # Load pre-trained model
         if model_name == 'alexnet':
@@ -39,8 +41,11 @@ class TransferLearning:
             self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
 
         # Set up optimizer and loss function
-        self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
-        self.criterion = nn.CrossEntropyLoss()
+        if self.optimizer == "adam":
+            self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        elif self.optimizer == "sgdm":
+            self.optimizer = optim.SGD(self.model.parameters(), lr=self.lr, momentum=momentum)
+
 
         # Move model to device
         self.model = self.model.to(self.device)
@@ -57,7 +62,7 @@ class TransferLearning:
                 self.optimizer.step()
 
             # Validation
-            accuracy = self.evaluate()
+            accuracy = self._evaluate()
 
             if epoch % 10 == 0:
                 print(f'Epoch {epoch}/{self.num_epochs}, Accuracy: {accuracy}%')
@@ -65,7 +70,7 @@ class TransferLearning:
         # Save the trained model
         torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
 
-    def evaluate(self):
+    def _evaluate(self):
         self.model.eval()
         correct = 0
         total = 0
@@ -81,7 +86,7 @@ class TransferLearning:
         accuracy = 100 * correct / total
         return accuracy
     
-    def load_data(self,train_path, test_path, transform, batch_size):
+    def _load_data(self,train_path, test_path, transform, batch_size):
         # Load training data
         train_dataset = datasets.ImageFolder(train_path, transform=transform)
         train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
