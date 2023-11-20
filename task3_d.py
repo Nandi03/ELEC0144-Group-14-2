@@ -36,7 +36,7 @@ optimizer = optim.Adam(googlenet.parameters(), lr=0.0001)
 criterion = nn.CrossEntropyLoss()
 
 # Training loop
-num_epochs = 10
+num_epochs = 100
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 googlenet = googlenet.to(device)
 

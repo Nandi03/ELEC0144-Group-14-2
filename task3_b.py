@@ -51,8 +51,19 @@ for epoch in range(1,num_epochs+1):
         loss.backward()
         optimizer.step()
 
+    accuracy = eval(alexnet, val_loader, device, criterion)
+    
+    if epoch % 10 == 0:
+        print(f'Epoch {epoch}/{num_epochs}, Loss: {val_loss / len(val_loader)}, Accuracy: {accuracy}%')
+
+# Save the trained model
+torch.save(alexnet.state_dict(), 'fruit_classifier_alexnet.pth')
+
+
+def eval(network, val_loader, device, criterion):
+
     # Validation
-    alexnet.eval()
+    network.eval()
     val_loss = 0.0
     correct = 0
     total = 0
@@ -60,16 +71,13 @@ for epoch in range(1,num_epochs+1):
     with torch.no_grad():
         for inputs, labels in val_loader:
             inputs, labels = inputs.to(device), labels.to(device)
-            outputs = alexnet(inputs)
+            outputs = network(inputs)
             loss = criterion(outputs, labels)
             val_loss += loss.item()
             _, predicted = outputs.max(1)
             total += labels.size(0)
             correct += predicted.eq(labels).sum().item()
-
+    
     accuracy = 100 * correct / total
-    if epoch % 10 == 0:
-        print(f'Epoch {epoch}/{num_epochs}, Loss: {val_loss / len(val_loader)}, Accuracy: {accuracy}%')
 
-# Save the trained model
-torch.save(alexnet.state_dict(), 'fruit_classifier_alexnet.pth')
+    return accuracy
