@@ -72,4 +72,4 @@ for epoch in range(1,num_epochs+1):
         print(f'Epoch {epoch}/{num_epochs}, Loss: {val_loss / len(val_loader)}, Accuracy: {accuracy}%')
 
 # Save the trained model
-torch.save(alexnet.state_dict(), 'fruit_classifier.pth')
+torch.save(alexnet.state_dict(), 'fruit_classifier_alexnet.pth')

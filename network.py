@@ -232,7 +232,7 @@ class Model:
 
     def mse_grad(self, actual, predicted):
         ''' 
-        Calculate and return the derivative of the squared error wrt to the loss function
+        Calculate and return the derivative of the squared error
         
         Parameters:
         > actual: the actual (true) output(s) as float(s)
@@ -315,9 +315,10 @@ class Layer:
         # for sgd + momentum
         self.velocity = np.zeros_like(self.weights)
         self.bias_velocity = np.zeros_like(self.bias)
+        self.alpha = 0.1 # Leaky ReLu gradient for negative inputs.
 
 
-    def get_activation(self, x, alpha=0.1):
+    def get_activation(self, x):
         '''
         Calculates the output using the layer's corresponding activation functions.
 
@@ -338,7 +339,7 @@ class Layer:
             return x
         
         elif self.activation == "leaky_relu":
-            return np.where(x > 0, x, alpha * x)
+            return np.where(x > 0, x, self.alpha * x)
         
         elif self.activation == "tanh":
             return np.tanh(x)
@@ -347,7 +348,7 @@ class Layer:
 
 
 
-    def get_derivative(self, x, alpha=0.1):
+    def get_derivative(self, x):
         '''
         Calculates the derivative of the layer's corresponding activation functions.
         Used in backpropagation for training the model.
@@ -369,7 +370,7 @@ class Layer:
             return 1
         
         elif self.activation == "leaky_relu":
-            return np.where(x > 0, 1, alpha)
+            return np.where(x > 0, 1, self.alpha)
         
         elif self.activation == "tanh":
             return 1.0 - np.tanh(x)**2
