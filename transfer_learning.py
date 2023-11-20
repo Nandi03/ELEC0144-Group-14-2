@@ -9,7 +9,7 @@ from torchvision.models import AlexNet_Weights, GoogLeNet_Weights
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, optimiser,batch_size, lr, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9):
+    def __init__(self, model_name, optimiser,batch_size, lr=0.01, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9):
         self.model_name = model_name
         self.optimizer = optimiser
         self.criterion = criterion
