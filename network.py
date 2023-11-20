@@ -49,43 +49,43 @@ class Model:
         self.momentum = 0.5 # a constant between 0 and 1
         self.one_hot = one_hot
 
-    def compile(self, x, y):
+    def compile(self, x, d):
         ''' Call the training algorithm for the corresponding optimizer'''
         if self.optimizer == "sgd":
-           self.sgd(x, y)
+           self.sgd(x, d)
         if self.optimizer == "adam":
-           self.adam(x, y)
+           self.adam(x, d)
         if self.optimizer == "sgd_momentum":
-            self.sgd_momentum(x, y)
+            self.sgd_momentum(x, d)
         if self.optimizer == "sgd_adaptive":
-            self.sgd_adaptive(x, y)
+            self.sgd_adaptive(x, d)
 
-    def sgd(self, x, y):
+    def sgd(self, x, d):
         '''
         Train the model using Stochastic Gradient Descent.
         '''
         for epoch in range(self.epochs):
             for i in range(len(x)):
                 # Forward pass
-                output, output_deactivated, input = self.forward(x[i])
+                output, v_j, input = self.forward(x[i])
             
                 # backpropagation
-                loss = self.mse(y[i], output)
+                loss = self.mse(d[i], output)
                                     
                 output_grad = None
     
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(d[i], output) * self.layers[j].get_derivative(v_j[j])                   
                     else:
-                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
 
                     self.layers[j].weights -= self.learning_rate * np.outer(input[j], output_grad) 
                     self.layers[j].bias -= self.learning_rate * output_grad
-            # Append loss every 100 epochs for plotting and tracking learning progress
+            # Append loss every epoch for plotting and tracking learning progress
             self.history.append(float(np.sum(loss)))
 
-    def adam(self, x, y):
+    def adam(self, x, d):
         '''
         Train the model using Adam.
         '''
@@ -93,18 +93,18 @@ class Model:
             raise IndexError
         for epoch in range(self.epochs):
             for i in range(len(x)):
-                output, output_deactivated, input = self.forward(x[i])
+                output, v_j, input = self.forward(x[i])
 
                 # Back propagation
-                loss = self.mse(y[i], output)
+                loss = self.mse(d[i], output)
 
                 output_grad = None
 
                 for j in range(len(self.layers)-1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(d[i], output) * self.layers[j].get_derivative(v_j[j])                   
                     else:
-                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
                   
                     dW = np.dot(input[j].T.reshape(-1, 1), output_grad)
                     dB = output_grad
@@ -123,27 +123,27 @@ class Model:
                 
                     self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat) + self.epsilon)
                     self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
-            # Append loss every 100 epochs for plotting and tracking learning progress
+            # Append loss every epoch for plotting and tracking learning progress
             self.history.append(float(np.sum(loss)))
 
-    def sgd_momentum(self, x, y):
+    def sgd_momentum(self, x, d):
         '''
         Train the model using Stochastic Gradient Descent with Momentum.
         '''
         for epoch in range(self.epochs):
             for i in range(len(x)):
                 # Forward pass
-                output, output_deactivated, input = self.forward(x[i])
+                output, v_j, input = self.forward(x[i])
             
                 # Backpropagation
-                loss = self.mse(y[i], output)
+                loss = self.mse(d[i], output)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(d[i], output) * self.layers[j].get_derivative(v_j[j])                   
                     else:
-                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
 
                     # Update velocities with momentum
                     self.layers[j].velocity = self.momentum * self.layers[j].velocity + self.learning_rate * np.outer(input[j], output_grad)
@@ -157,24 +157,24 @@ class Model:
             self.history.append(float(np.sum(loss)))
 
         
-    def sgd_adaptive(self, x, y):
+    def sgd_adaptive(self, x, d):
         '''
         Train the model using Stochastic Gradient Descent with Adaptive Learning Rate.
         '''
         for epoch in range(self.epochs):
             for i in range(len(x)):
                 # Forward pass
-                output, output_deactivated, input = self.forward(x[i])
+                output, v_j, input = self.forward(x[i])
 
                 # Backpropagation
-                loss = self.mse(y[i], output)
+                loss = self.mse(d[i], output)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(d[i], output) * self.layers[j].get_derivative(v_j[j])                   
                     else:
-                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
                     
                     # Accumulate squared gradients for Adagrad
                     self.layers[j].velocity += output_grad**2
@@ -201,14 +201,14 @@ class Model:
         '''
         # Forward pass
         output = None
-        output_deactivated = []
+        v_j = []
         input = [x]
         for j in range(len(self.layers)):
             output = (np.dot(input[j], self.layers[j].weights) + self.layers[j].bias) 
-            output_deactivated.append(output)
+            v_j.append(output)
             output = self.layers[j].get_activation(output)
             input.append(output)
-        return output, output_deactivated, input
+        return output, v_j, input
     
     def mse(self, actual, predicted):
         ''' 
@@ -251,7 +251,7 @@ class Model:
 
     def fit(self, x):
         ''' 
-        Given x-values from a testing data set, predicts the y-values using the model after training.
+        Given x-values from a testing data set, predicts the d-values using the model after training.
 
         Parameters:
         > x: an array of the testing values compatible with the model
@@ -301,7 +301,7 @@ class Layer:
     :param output_shape: int - output shape of the output layer should match the dimension of the output. For the layers, the output shape should match the input shape of the next layer.
     :param seed: int - seed value for the np.random.seed() used to ensure reproducibility; has a default value of 42.
     '''
-    def __init__(self, activation="linear", input_shape=1, output_shape=1, seed=42):
+    def __init__(self, activation="linear", input_shape=1, output_shape=1):
         '''
         Initialise a layer with attributes; activation, input_shape and output_shape
         '''

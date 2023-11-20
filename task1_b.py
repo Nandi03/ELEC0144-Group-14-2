@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 np.random.seed(0)
-model = Model(learning_rate=0.001, optimizer="adam", epochs=1000)
+model = Model(learning_rate=0.1, optimizer="sgd", epochs=2000)
 #model.momentum = 0.3
 
 model.layers.append(Layer("tanh", 1, 3))
