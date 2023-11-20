@@ -5,17 +5,19 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
 from torchvision.models import AlexNet, GoogLeNet
 
+# Set random seed for reproducibility
+torch.manual_seed(42)
+
 class TransferLearning:
-    def __init__(self, model_name, num_classes, input_size, train_path, test_path, batch_size=5, lr=0.0001, num_epochs=100):
+    def __init__(self, model_name, batch_size, lr, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100):
         self.model_name = model_name
         self.num_classes = num_classes
-        self.input_size = input_size
         self.batch_size = batch_size
         self.lr = lr
         self.num_epochs = num_epochs
+        self.train_path = train_path
+        self.test_path = test_path
 
-        # Set random seed for reproducibility
-        torch.manual_seed(42)
 
         # Data augmentation and normalization
         transform = transforms.Compose([
@@ -39,8 +41,6 @@ class TransferLearning:
         elif model_name == 'googlenet':
             self.model = models.googlenet(pretrained=True)
             self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
-        else:
-            raise ValueError("Invalid model name. Supported models: 'alexnet', 'googlenet'")
 
         # Set up optimizer and loss function
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
@@ -71,7 +71,6 @@ class TransferLearning:
         torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
 
     def evaluate(self):
-        # Validation
         self.model.eval()
         correct = 0
         total = 0
@@ -86,29 +85,3 @@ class TransferLearning:
 
         accuracy = 100 * correct / total
         return accuracy
-
-# Example usage for AlexNet
-alexnet_transfer = TransferLearning(
-    model_name='alexnet',
-    num_classes=5,
-    input_size=(227, 227),
-    train_path='task3data/train',
-    test_path='task3data/test',
-    batch_size=5,
-    lr=0.0001,
-    num_epochs=100
-)
-alexnet_transfer.train()
-
-# Example usage for GoogLeNet
-googlenet_transfer = TransferLearning(
-    model_name='googlenet',
-    num_classes=5,
-    input_size=(224, 224),
-    train_path='task3data/train',
-    test_path='task3data/test',
-    batch_size=2,
-    lr=0.0001,
-    num_epochs=100
-)
-googlenet_transfer.train()

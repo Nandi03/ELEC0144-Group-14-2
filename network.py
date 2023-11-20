@@ -38,7 +38,7 @@ class Model:
     def __init__(self, epochs=1000, learning_rate=0.1, optimizer="sgd", one_hot=False) -> None:
         '''
         Create a neural network.
-        Intialised with no layers. Append new layers in the order from input layer to output layer to array 'layers'.
+        Intialised with no layers. Append new layers in the order from input layer to x_out layer to array 'layers'.
         '''
         self.layers = []
         self.epochs = epochs
@@ -50,43 +50,43 @@ class Model:
         self.momentum = 0.5 # a constant between 0 and 1
         self.one_hot = one_hot
 
-    def compile(self, x, y):
+    def compile(self, x, d):
         ''' Call the training algorithm for the corresponding optimizer'''
         if self.optimizer == "sgd":
-           self.sgd(x, y)
+           self.sgd(x, d)
         if self.optimizer == "adam":
-           self.adam(x, y)
+           self.adam(x, d)
         if self.optimizer == "sgd_momentum":
-            self.sgd_momentum(x, y)
+            self.sgd_momentum(x, d)
         if self.optimizer == "sgd_adaptive":
-            self.sgd_adaptive(x, y)
+            self.sgd_adaptive(x, d)
 
-    def sgd(self, x, y):
+    def sgd(self, x, d):
         '''
         Train the model using Stochastic Gradient Descent.
         '''
         for epoch in range(self.epochs):
             for i in range(len(x)):
                 # Forward pass
-                output, output_deactivated, input = self.forward(x[i])
+                y, v_j, input = self.forward(x[i])
             
                 # backpropagation
-                loss = self.mse(y[i], output)
+                loss = self.mse(d[i], y)
                                     
                 output_grad = None
     
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
                     else:
-                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
 
                     self.layers[j].weights -= self.learning_rate * np.outer(input[j], output_grad) 
                     self.layers[j].bias -= self.learning_rate * output_grad
-            # Append loss every 100 epochs for plotting and tracking learning progress
+            # Append loss every epoch for plotting and tracking learning progress
             self.history.append(float(np.sum(loss)))
 
-    def adam(self, x, y):
+    def adam(self, x, d):
         '''
         Train the model using Adam.
         '''
@@ -94,18 +94,18 @@ class Model:
             raise IndexError
         for epoch in range(self.epochs):
             for i in range(len(x)):
-                output, output_deactivated, input = self.forward(x[i])
+                y, v_j, input = self.forward(x[i])
 
                 # Back propagation
-                loss = self.mse(y[i], output)
+                loss = self.mse(d[i], y)
 
                 output_grad = None
 
                 for j in range(len(self.layers)-1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
                     else:
-                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
                   
                     dW = np.dot(input[j].T.reshape(-1, 1), output_grad)
                     dB = output_grad
@@ -124,27 +124,27 @@ class Model:
                 
                     self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat) + self.epsilon)
                     self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
-            # Append loss every 100 epochs for plotting and tracking learning progress
+            # Append loss every epoch for plotting and tracking learning progress
             self.history.append(float(np.sum(loss)))
 
-    def sgd_momentum(self, x, y):
+    def sgd_momentum(self, x, d):
         '''
         Train the model using Stochastic Gradient Descent with Momentum.
         '''
         for epoch in range(self.epochs):
             for i in range(len(x)):
                 # Forward pass
-                output, output_deactivated, input = self.forward(x[i])
+                y, v_j, input = self.forward(x[i])
             
                 # Backpropagation
-                loss = self.mse(y[i], output)
+                loss = self.mse(d[i], y)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
                     else:
-                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
 
                     # Update velocities with momentum
                     self.layers[j].velocity = self.momentum * self.layers[j].velocity + self.learning_rate * np.outer(input[j], output_grad)
@@ -158,24 +158,24 @@ class Model:
             self.history.append(float(np.sum(loss)))
 
         
-    def sgd_adaptive(self, x, y):
+    def sgd_adaptive(self, x, d):
         '''
         Train the model using Stochastic Gradient Descent with Adaptive Learning Rate.
         '''
         for epoch in range(self.epochs):
             for i in range(len(x)):
                 # Forward pass
-                output, output_deactivated, input = self.forward(x[i])
+                y, v_j, input = self.forward(x[i])
 
                 # Backpropagation
-                loss = self.mse(y[i], output)
+                loss = self.mse(d[i], y)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(y[i], output) * self.layers[j].get_derivative(output_deactivated[j])                   
+                        output_grad = self.mse_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
                     else:
-                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(output_deactivated[j])
+                        output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
                     
                     # Accumulate squared gradients for Adagrad
                     self.layers[j].velocity += output_grad**2
@@ -195,28 +195,28 @@ class Model:
         x: a value(s) of type float
         
         Returns:
-        > the output at each layer as an array
-        > the output without activation function at each layer as an array
-        > the input to each layer 
+        > x_out: the output at each layer as an array
+        > v_j: the output without activation function at each layer as an array
+        > input: array, the input to each layer 
         
         '''
         # Forward pass
-        output = None
-        output_deactivated = []
+        x_out = None
+        v_j = []
         input = [x]
-        for j in range(len(self.layers)):
-            output = (np.dot(input[j], self.layers[j].weights) + self.layers[j].bias) 
-            output_deactivated.append(output)
-            output = self.layers[j].get_activation(output)
-            input.append(output)
-        return output, output_deactivated, input
+        for s in range(len(self.layers)):
+            x_out = (np.dot(input[s], self.layers[s].weights) + self.layers[s].bias) 
+            v_j.append(x_out)
+            x_out = self.layers[s].get_activation(x_out)
+            input.append(x_out)
+        return x_out, v_j, input
     
     def mse(self, actual, predicted):
         ''' 
         Calculate and return the squared error
 
         Parameters:
-        > actual: the actual (true) output(s) as float(s)
+        > actual: the actual (true) x_out(s) as float(s)
         > predicted: the predicted value(s) as float(s)
         
         return:
@@ -235,7 +235,7 @@ class Model:
         Calculate and return the derivative of the squared error
         
         Parameters:
-        > actual: the actual (true) output(s) as float(s)
+        > actual: the actual (true) x_out(s) as float(s)
         > predicted: the predicted value(s) as float(s)
         
         returns:
@@ -252,22 +252,22 @@ class Model:
 
     def fit(self, x):
         ''' 
-        Given x-values from a testing data set, predicts the y-values using the model after training.
+        Given x-values from a testing data set, predicts the d-values using the model after training.
 
         Parameters:
         > x: an array of the testing values compatible with the model
         
         returns:
-        > An array of the predictions (output)
+        > An array of the predictions (x_out)
 
         '''
         predictions = []
         for i in range(len(x)):
             input = x[i]
-            output = None
+            x_out = None
             for j in range(len(self.layers)):
-                output = (np.dot(input, self.layers[j].weights) + self.layers[j].bias) 
-                output_activated = self.layers[j].get_activation(output)
+                x_out = (np.dot(input, self.layers[j].weights) + self.layers[j].bias) 
+                output_activated = self.layers[j].get_activation(x_out)
                 input = output_activated
                 if len(output_activated[0]) == 1:
                     output_activated = np.sum(output_activated)
@@ -298,8 +298,8 @@ class Layer:
     Using an activation function other than these will cause a ValueError.
 
     :param activation: str - set to 'linear' by default. Other activation functions include: tanh, sigmoid, ReLu and Leaky ReLu.
-    :param input_shape: int - input shape of the input layer should match the dimension of the input. For other layers, input shape should match the output shape of previous layer.
-    :param output_shape: int - output shape of the output layer should match the dimension of the output. For the layers, the output shape should match the input shape of the next layer.
+    :param input_shape: int - input shape of the input layer should match the dimension of the input. For other layers, input shape should match the x_out shape of previous layer.
+    :param output_shape: int - x_out shape of the x_out layer should match the dimension of the x_out. For the layers, the x_out shape should match the input shape of the next layer.
     :param seed: int - seed value for the np.random.seed() used to ensure reproducibility; has a default value of 42.
     '''
     def __init__(self, activation="linear", input_shape=1, output_shape=1):
@@ -320,14 +320,14 @@ class Layer:
 
     def get_activation(self, x):
         '''
-        Calculates the output using the layer's corresponding activation functions.
+        Calculates the x_out using the layer's corresponding activation functions.
 
         Parameters:
-        > x: the output value(s) of type float
+        > x: the x_out value(s) of type float
         > alpha (optional): used as the gradient for leaky ReLu
 
         Returns:
-        > the output after activation for that layer as float(s)
+        > the x_out after activation for that layer as float(s)
         '''
         if self.activation == "sigmoid":
             return 1 / (1 + np.exp(-x))
@@ -354,7 +354,7 @@ class Layer:
         Used in backpropagation for training the model.
 
         Parameters:
-        > x: the output value(s) before activation of the layer as type float.
+        > x: the x_out value(s) before activation of the layer as type float.
         > alpha (optional): used as the gradient for leaky ReLu
 
         Returns:
