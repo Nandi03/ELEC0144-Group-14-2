@@ -1,6 +1,5 @@
 from transfer_learning import TransferLearning
 
-# Example usage for GoogLeNet
 googlenet_transfer = TransferLearning(
     model_name='googlenet',
     batch_size=2,
