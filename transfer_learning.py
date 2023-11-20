@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
-from torchvision.models import AlexNet, GoogLeNet
+from torchvision.models import AlexNet_Weights, GoogLeNet_Weights
 
 # Set random seed for reproducibility
 torch.manual_seed(42)
@@ -17,12 +17,11 @@ class TransferLearning:
         self.num_epochs = num_epochs
         self.train_path = train_path
         self.test_path = test_path
-        self.input_size = (227,227)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # Move to gpu if available
 
         # Data augmentation and normalization
         transform = transforms.Compose([
-            transforms.Resize(self.input_size),
+            transforms.Resize((227,227)),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
@@ -33,10 +32,10 @@ class TransferLearning:
 
         # Load pre-trained model
         if model_name == 'alexnet':
-            self.model = models.alexnet(pretrained=True)
+            self.model = models.alexnet(weights=AlexNet_Weights.DEFAULT)
             self.model.classifier[6] = nn.Linear(4096, self.num_classes)
         elif model_name == 'googlenet':
-            self.model = models.googlenet(pretrained=True)
+            self.model = models.googlenet(weights=GoogLeNet_Weights.IMAGENET1K_V1)
             self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
 
         # Set up optimizer and loss function
