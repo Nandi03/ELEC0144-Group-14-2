@@ -19,7 +19,7 @@ class TransferLearning:
         self.num_epochs = num_epochs
         self.train_path = train_path
         self.test_path = test_path
-        self.device = torch.device('mps' if torch.device("mps") else 'cpu') # Move to gpu if available
+        self.device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') # Move to gpu if available
 
         # Data augmentation and normalization
         transform = transforms.Compose([
