@@ -6,5 +6,6 @@ alexnet_transfer = TransferLearning(
     batch_size=5,
     lr=0.0001,
     num_epochs=10,
+    num_layers_to_replace=4
 )
 alexnet_transfer.train()

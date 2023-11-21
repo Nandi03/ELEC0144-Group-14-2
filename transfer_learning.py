@@ -11,7 +11,6 @@ torch.manual_seed(42)
 class TransferLearning:
     def __init__(self, model_name, optimiser,batch_size, lr=0.01, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
         self.model_name = model_name
-        self.optimizer = optimiser
         self.criterion = criterion
         self.num_classes = num_classes
         self.batch_size = batch_size
@@ -91,7 +90,7 @@ class TransferLearning:
     def _load_data(self):
         # Load training data
         train_dataset = datasets.ImageFolder(self.train_path, transform=self.transform)
-        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
 
         # Load validation data
         val_dataset = datasets.ImageFolder(self.test_path, transform=self.transform)
