@@ -1,5 +1,6 @@
 import numpy as np
-np.random.seed(0)
+np.random.seed(42)
+
 class Model:
     '''
     Implements functions to create and train a neural network.
@@ -306,7 +307,7 @@ class Layer:
         Initialise a layer with attributes; activation, input_shape and output_shape
         '''
         self.activation = activation
-        self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape)) 
+        self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
         self.bias = np.zeros((1, output_shape)) 
         # for adam 
         self.m_W, self.m_B = 0, 0
