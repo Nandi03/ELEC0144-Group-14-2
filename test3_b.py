@@ -5,6 +5,6 @@ alexnet_transfer = TransferLearning(
     optimiser="adam",
     batch_size=5,
     lr=0.0001,
-    num_epochs=100
+    num_epochs=10
 )
 alexnet_transfer.train()

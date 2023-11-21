@@ -64,11 +64,11 @@ class TransferLearning:
             # Validation
             accuracy = self._evaluate()
 
-            if epoch % 10 == 0:
-                print(f'Epoch {epoch}/{self.num_epochs}, Accuracy: {accuracy}%')
+            if epoch % 1 == 0:
+                print(f'Epoch {epoch}/{self.num_epochs}, Loss: {loss},Accuracy: {accuracy}%')
 
         # Save the trained model
-        torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
+        # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
 
     def _evaluate(self):
         self.model.eval()
