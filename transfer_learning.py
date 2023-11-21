@@ -10,6 +10,46 @@ torch.manual_seed(42)
 
 class TransferLearning:
     def __init__(self, model_name, optimiser,batch_size, lr=0.01, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
+        
+        '''
+        Initializes the TransferLearning class with the specified parameters.
+
+        Args:
+            model_name (str): Name of the pre-trained model ('alexnet' or 'googlenet').
+            optimizer (str): Name of the optimizer ('adam' or 'sgdm').
+            batch_size (int): Number of samples in each batch for training and validation.
+            lr (float): Learning rate for the optimizer.
+            num_classes (int): Number of classes in the classification task.
+            train_path (str): Path to the training data.
+            test_path (str): Path to the validation data.
+            num_epochs (int): Number of epochs for training.
+            criterion (torch.nn.Module): Loss function for training.
+            momentum (float): Momentum factor for the SGD optimizer.
+            num_layers_to_replace (int): Number of classifier layers to replace in the modified AlexNet.
+
+        Attributes:
+            model_name (str): Name of the pre-trained model.
+            optimizer (str): Name of the optimizer.
+            batch_size (int): Number of samples in each batch.
+            lr (float): Learning rate for the optimizer.
+            num_classes (int): Number of classes.
+            num_layers_to_replace (int): Number of layers to replace in the modified AlexNet.
+            num_epochs (int): Number of training epochs.
+            train_path (str): Path to the training data.
+            test_path (str): Path to the validation data.
+            criterion (torch.nn.Module): Loss function.
+            momentum (float): Momentum factor for SGD optimizer.
+            transform (torchvision.transforms.Compose): Data augmentation and normalization transformations.
+            train_loader (torch.utils.data.DataLoader): DataLoader for training data.
+            val_loader (torch.utils.data.DataLoader): DataLoader for validation data.
+            device (torch.device): Device to which the model is moved (GPU or CPU).
+            model (torch.nn.Module): Pre-trained model with modified classifier.
+            optimizer (torch.optim.Optimizer): Optimizer for training.
+
+        Returns:
+            None
+        '''
+
         self.model_name = model_name
         self.criterion = criterion
         self.num_classes = num_classes
@@ -52,6 +92,17 @@ class TransferLearning:
         self.model = self.model.to(self.device)
 
     def train(self):
+
+        '''
+        Trains the model for the specified number of epochs.
+
+        Args:
+            None
+
+        Returns:
+            None
+        '''
+
         for epoch in range(1, self.num_epochs + 1):
             self.model.train()
             for inputs, labels in self.train_loader:
@@ -72,6 +123,17 @@ class TransferLearning:
         # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
 
     def _evaluate(self):
+
+        '''
+        Evaluates the model on the validation data and returns the accuracy.
+
+        Args:
+            None
+
+        Returns:
+            float: Accuracy on the validation data.
+        '''
+
         self.model.eval()
         correct = 0
         total = 0
@@ -88,6 +150,18 @@ class TransferLearning:
         return accuracy
     
     def _load_data(self):
+
+        '''
+        Loads and prepares the training and validation data using ImageFolder.
+
+        Args:
+            None
+
+        Returns:
+            torch.utils.data.DataLoader: DataLoader for training data.
+            torch.utils.data.DataLoader: DataLoader for validation data.
+        '''
+
         # Load training data
         train_dataset = datasets.ImageFolder(self.train_path, transform=self.transform)
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
@@ -99,6 +173,16 @@ class TransferLearning:
         return train_loader, val_loader
     
     def _modify_alexnet(self, num_layers_to_replace):
+
+        '''
+        Modifies the AlexNet model by replacing a specified number of classifier layers.
+
+        Args:
+            num_layers_to_replace (int): Number of layers to replace.
+
+        Returns:
+            None
+        '''
         # Replace the classifier layers before the last two layers
         
         # Extract the classifier layers
