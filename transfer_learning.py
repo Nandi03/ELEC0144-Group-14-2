@@ -9,13 +9,14 @@ from torchvision.models import AlexNet_Weights, GoogLeNet_Weights
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, optimiser,batch_size, lr=0.01, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9):
+    def __init__(self, model_name, optimiser,batch_size, lr=0.01, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
         self.model_name = model_name
         self.optimizer = optimiser
         self.criterion = criterion
         self.num_classes = num_classes
         self.batch_size = batch_size
         self.lr = lr
+        self.num_layers_to_replace = num_layers_to_replace
         self.num_epochs = num_epochs
         self.train_path = train_path
         self.test_path = test_path
@@ -35,7 +36,8 @@ class TransferLearning:
         # Load pre-trained model
         if model_name == 'alexnet':
             self.model = models.alexnet(weights=AlexNet_Weights.DEFAULT)
-            self.model.classifier[6] = nn.Linear(4096, self.num_classes)
+            self._modify_alexnet(self.num_layers_to_replace)
+
         elif model_name == 'googlenet':
             self.model = models.googlenet(weights=GoogLeNet_Weights.IMAGENET1K_V1)
             self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
@@ -96,3 +98,15 @@ class TransferLearning:
         val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
         return train_loader, val_loader
+    
+    def _modify_alexnet(self, num_layers_to_replace):
+        # Replace the classifier layers before the last two layers
+        
+        # Extract the classifier layers
+        classifier_layers = list(self.model.classifier.children())
+
+        # Replace the specified number of layers before the last two layers
+        modified_classifier = nn.Sequential(*classifier_layers[:-num_layers_to_replace], nn.Linear(4096, self.num_classes))
+
+        # Set the modified classifier back to the model
+        self.model.classifier = modified_classifier
