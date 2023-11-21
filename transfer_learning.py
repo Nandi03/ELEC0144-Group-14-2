@@ -16,41 +16,42 @@ class TransferLearning:
 
         Args:
             model_name (str): Name of the pre-trained model ('alexnet' or 'googlenet').
-            optimizer (str): Name of the optimizer ('adam' or 'sgdm').
+            optimiser (str): Name of the optimiser ('adam' or 'sgdm').
             batch_size (int): Number of samples in each batch for training and validation.
-            lr (float): Learning rate for the optimizer.
+            lr (float): Learning rate for the optimiser.
             num_classes (int): Number of classes in the classification task.
             train_path (str): Path to the training data.
             test_path (str): Path to the validation data.
             num_epochs (int): Number of epochs for training.
             criterion (torch.nn.Module): Loss function for training.
-            momentum (float): Momentum factor for the SGD optimizer.
+            momentum (float): Momentum factor for the SGD optimiser.
             num_layers_to_replace (int): Number of classifier layers to replace in the modified AlexNet.
 
         Attributes:
             model_name (str): Name of the pre-trained model.
-            optimizer (str): Name of the optimizer.
+            optimiser (str): Name of the optimiser.
             batch_size (int): Number of samples in each batch.
-            lr (float): Learning rate for the optimizer.
+            lr (float): Learning rate for the optimiser.
             num_classes (int): Number of classes.
             num_layers_to_replace (int): Number of layers to replace in the modified AlexNet.
             num_epochs (int): Number of training epochs.
             train_path (str): Path to the training data.
             test_path (str): Path to the validation data.
             criterion (torch.nn.Module): Loss function.
-            momentum (float): Momentum factor for SGD optimizer.
+            momentum (float): Momentum factor for SGD optimiser.
             transform (torchvision.transforms.Compose): Data augmentation and normalization transformations.
             train_loader (torch.utils.data.DataLoader): DataLoader for training data.
             val_loader (torch.utils.data.DataLoader): DataLoader for validation data.
             device (torch.device): Device to which the model is moved (GPU or CPU).
             model (torch.nn.Module): Pre-trained model with modified classifier.
-            optimizer (torch.optim.Optimizer): Optimizer for training.
+            optimiser (torch.optim.Optimiser): Optimiser for training.
 
         Returns:
             None
         '''
 
         self.model_name = model_name
+        self.optimiser = optimiser
         self.criterion = criterion
         self.num_classes = num_classes
         self.batch_size = batch_size
@@ -73,23 +74,14 @@ class TransferLearning:
         self.train_loader, self.val_loader = self._load_data()
 
         # Load pre-trained model
-        if model_name == 'alexnet':
-            self.model = models.alexnet(weights=AlexNet_Weights.DEFAULT)
-            self._modify_alexnet(self.num_layers_to_replace)
+        self.use_pretrained_model()
 
-        elif model_name == 'googlenet':
-            self.model = models.googlenet(weights=GoogLeNet_Weights.IMAGENET1K_V1)
-            self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
-
-        # Set up optimizer and loss function
-        if self.optimizer == "adam":
-            self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
-        elif self.optimizer == "sgdm":
-            self.optimizer = optim.SGD(self.model.parameters(), lr=self.lr, momentum=momentum)
-
+        # Set up optimiser and loss function
+        self.set_optimiser()
 
         # Move model to device
         self.model = self.model.to(self.device)
+
 
     def train(self):
 
@@ -107,11 +99,11 @@ class TransferLearning:
             self.model.train()
             for inputs, labels in self.train_loader:
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
-                self.optimizer.zero_grad()
+                self.optimiser.zero_grad()
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, labels)
                 loss.backward()
-                self.optimizer.step()
+                self.optimiser.step()
 
             # Validation
             accuracy = self._evaluate()
@@ -121,6 +113,39 @@ class TransferLearning:
 
         # Save the trained model
         # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
+
+    def set_optimiser(self):
+        '''
+        Sets the optimiser for the model.
+
+        Args:
+            None
+
+        Returns:
+            None
+        '''
+        if self.optimiser == "adam":
+            self.optimiser = optim.Adam(self.model.parameters(), lr=self.lr)
+        elif self.optimiser == "sgdm":
+            self.optimiser = optim.SGD(self.model.parameters(), lr=self.lr, momentum=self.momentum)
+
+    def use_pretrained_model(self):
+        '''
+        Sets the model to either AlexNet or GoogLeNet and modifies the classifier layers for AlexNet.
+
+        Args:
+            model_name (str): Name of the pre-trained model ('alexnet' or 'googlenet').
+            num_layers_to_replace (int): Number of classifier layers to replace in the modified AlexNet.
+
+        Returns:
+            None
+        '''
+        if self.model_name == 'alexnet':
+            self.model = models.alexnet(weights=AlexNet_Weights.DEFAULT)
+            self._modify_alexnet(self.num_layers_to_replace)
+        elif self.model_name == 'googlenet':
+            self.model = models.googlenet(weights=GoogLeNet_Weights.IMAGENET1K_V1)
+            self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
 
     def _evaluate(self):
 
