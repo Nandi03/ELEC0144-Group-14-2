@@ -9,20 +9,20 @@ from torchvision.models import AlexNet_Weights, GoogLeNet_Weights
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, optimiser,batch_size, lr=0.01, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9):
+    def __init__(self, model_name, optimiser,batch_size, lr=0.01, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
         self.model_name = model_name
-        self.optimizer = optimiser
         self.criterion = criterion
         self.num_classes = num_classes
         self.batch_size = batch_size
         self.lr = lr
+        self.num_layers_to_replace = num_layers_to_replace
         self.num_epochs = num_epochs
         self.train_path = train_path
         self.test_path = test_path
-        self.device = torch.device('mps' if torch.device("mps") else 'cpu') # Move to gpu if available
+        self.device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') # Move to gpu if available
 
         # Data augmentation and normalization
-        transform = transforms.Compose([
+        self.transform = transforms.Compose([
             transforms.Resize((227,227)),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
@@ -30,12 +30,13 @@ class TransferLearning:
         ])
 
         # Load the data
-        self.train_loader, self.val_loader = self._load_data(self.train_path, self.test_path, transform, self.batch_size)
+        self.train_loader, self.val_loader = self._load_data()
 
         # Load pre-trained model
         if model_name == 'alexnet':
             self.model = models.alexnet(weights=AlexNet_Weights.DEFAULT)
-            self.model.classifier[6] = nn.Linear(4096, self.num_classes)
+            self._modify_alexnet(self.num_layers_to_replace)
+
         elif model_name == 'googlenet':
             self.model = models.googlenet(weights=GoogLeNet_Weights.IMAGENET1K_V1)
             self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
@@ -64,11 +65,11 @@ class TransferLearning:
             # Validation
             accuracy = self._evaluate()
 
-            if epoch % 10 == 0:
-                print(f'Epoch {epoch}/{self.num_epochs}, Accuracy: {accuracy}%')
+            if epoch % 1 == 0:
+                print(f'Epoch {epoch}/{self.num_epochs}, Loss: {loss},Accuracy: {accuracy}%')
 
         # Save the trained model
-        torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
+        # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
 
     def _evaluate(self):
         self.model.eval()
@@ -86,13 +87,25 @@ class TransferLearning:
         accuracy = 100 * correct / total
         return accuracy
     
-    def _load_data(self,train_path, test_path, transform, batch_size):
+    def _load_data(self):
         # Load training data
-        train_dataset = datasets.ImageFolder(train_path, transform=transform)
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        train_dataset = datasets.ImageFolder(self.train_path, transform=self.transform)
+        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
 
         # Load validation data
-        val_dataset = datasets.ImageFolder(test_path, transform=transform)
-        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+        val_dataset = datasets.ImageFolder(self.test_path, transform=self.transform)
+        val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
         return train_loader, val_loader
+    
+    def _modify_alexnet(self, num_layers_to_replace):
+        # Replace the classifier layers before the last two layers
+        
+        # Extract the classifier layers
+        classifier_layers = list(self.model.classifier.children())
+
+        # Replace the specified number of layers before the last two layers
+        modified_classifier = nn.Sequential(*classifier_layers[:-num_layers_to_replace], nn.Linear(4096, self.num_classes))
+
+        # Set the modified classifier back to the model
+        self.model.classifier = modified_classifier
