@@ -22,7 +22,7 @@ class TransferLearning:
         self.device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') # Move to gpu if available
 
         # Data augmentation and normalization
-        transform = transforms.Compose([
+        self.transform = transforms.Compose([
             transforms.Resize((227,227)),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
@@ -30,7 +30,7 @@ class TransferLearning:
         ])
 
         # Load the data
-        self.train_loader, self.val_loader = self._load_data(self.train_path, self.test_path, transform, self.batch_size)
+        self.train_loader, self.val_loader = self._load_data()
 
         # Load pre-trained model
         if model_name == 'alexnet':
@@ -86,13 +86,13 @@ class TransferLearning:
         accuracy = 100 * correct / total
         return accuracy
     
-    def _load_data(self,train_path, test_path, transform, batch_size):
+    def _load_data(self):
         # Load training data
-        train_dataset = datasets.ImageFolder(train_path, transform=transform)
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        train_dataset = datasets.ImageFolder(self.train_path, transform=self.transform)
+        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
 
         # Load validation data
-        val_dataset = datasets.ImageFolder(test_path, transform=transform)
-        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+        val_dataset = datasets.ImageFolder(self.test_path, transform=self.transform)
+        val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
         return train_loader, val_loader
