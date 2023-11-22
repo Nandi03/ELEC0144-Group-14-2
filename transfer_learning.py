@@ -7,7 +7,6 @@ from torchvision.models import AlexNet_Weights, GoogLeNet_Weights
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
 
 # Set random seed for reproducibility
 torch.manual_seed(42)
