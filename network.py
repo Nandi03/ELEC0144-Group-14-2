@@ -258,7 +258,7 @@ class Model:
         > x: an array of the testing values compatible with the model
         
         returns:
-        > An array of the predictions (x_out)
+        > An array of the predictions (output y)
 
         '''
         predictions = []
