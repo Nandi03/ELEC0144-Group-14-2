@@ -52,7 +52,7 @@ class TransferLearning:
         Returns:
             None
         '''
-        self.class_names = ["Durian", "Papaya", "Kiwi", "mangosteen", "Mango"]
+        self.class_names = ["Durian", "Papaya", "Kiwi", "Mangosteen", "Mango"]
         self.model_name = model_name
         self.optimiser = optimiser
         self.criterion = criterion
