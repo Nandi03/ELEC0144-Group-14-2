@@ -4,6 +4,10 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
 from torchvision.models import AlexNet_Weights, GoogLeNet_Weights
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Set random seed for reproducibility
 torch.manual_seed(42)
@@ -49,7 +53,7 @@ class TransferLearning:
         Returns:
             None
         '''
-
+        self.class_names = ["Durian", "Papaya", "Kiwi", "mangosteen", "Mango"]
         self.model_name = model_name
         self.optimiser = optimiser
         self.criterion = criterion
@@ -111,6 +115,7 @@ class TransferLearning:
             if epoch % 1 == 0:
                 print(f'Epoch {epoch}/{self.num_epochs}, Loss: {loss},Accuracy: {accuracy}%')
 
+        self.print_confusion_matrix()
         # Save the trained model
         # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
 
@@ -218,3 +223,38 @@ class TransferLearning:
 
         # Set the modified classifier back to the model
         self.model.classifier = modified_classifier
+
+    def print_confusion_matrix(self):
+        '''
+        Prints the confusion matrix after training.
+
+        Args:
+            None
+
+        Returns:
+            None
+        '''
+
+        self.model.eval()
+        all_labels = []
+        all_predicted = []
+
+        with torch.no_grad():
+            for inputs, labels in self.val_loader:
+                inputs, labels = inputs.to(self.device), labels.to(self.device)
+                outputs = self.model(inputs)
+                _, predicted = outputs.max(1)
+
+                all_labels.extend(labels.cpu().numpy())
+                all_predicted.extend(predicted.cpu().numpy())
+
+        # Calculate confusion matrix
+        cm = confusion_matrix(all_labels, all_predicted)
+
+        # Plot confusion matrix
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=self.class_names, yticklabels=self.class_names)
+        plt.title('Confusion Matrix')
+        plt.xlabel('Predicted')
+        plt.ylabel('True')
+        plt.show()
