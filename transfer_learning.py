@@ -4,6 +4,9 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
 from torchvision.models import AlexNet_Weights, GoogLeNet_Weights
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Set random seed for reproducibility
 torch.manual_seed(42)
@@ -49,7 +52,7 @@ class TransferLearning:
         Returns:
             None
         '''
-
+        self.class_names = ["Durian", "Papaya", "Kiwi", "Mangosteen", "Mango"]
         self.model_name = model_name
         self.optimiser = optimiser
         self.criterion = criterion
@@ -82,18 +85,45 @@ class TransferLearning:
         # Move model to device
         self.model = self.model.to(self.device)
 
-
     def train(self):
+            '''
+            Trains the model for the specified number of epochs.
 
+            Args:
+                None
+
+            Returns:
+                None
+            '''
+            loss_values, accuracy_values = self._train_and_evaluate()
+
+            # Display line graph for loss over epochs
+            self.plot_loss_graph(loss_values)
+
+            # Display line graph for accuracy over epochs
+            self.plot_accuracy_graph(accuracy_values)
+
+            # Display the table after training using the new method
+            self.display_epoch_table(list(zip(range(1, self.num_epochs + 1), loss_values, accuracy_values)))
+
+            self._print_confusion_matrix()
+            # Save the trained model
+            # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
+
+
+    def _train_and_evaluate(self):
         '''
-        Trains the model for the specified number of epochs.
+        Internal method for training the model and evaluating loss and accuracy.
 
         Args:
             None
 
         Returns:
-            None
+            list: Loss values for each epoch.
+            list: Accuracy values for each epoch.
         '''
+        loss_values = []  # List to store loss for each epoch
+        accuracy_values = []  # List to store accuracy for each epoch
 
         for epoch in range(1, self.num_epochs + 1):
             self.model.train()
@@ -108,11 +138,11 @@ class TransferLearning:
             # Validation
             accuracy = self._evaluate()
 
-            if epoch % 1 == 0:
-                print(f'Epoch {epoch}/{self.num_epochs}, Loss: {loss},Accuracy: {accuracy}%')
+            # Append loss and accuracy values for the current epoch
+            loss_values.append(loss.item())
+            accuracy_values.append(accuracy)
 
-        # Save the trained model
-        # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
+        return loss_values, accuracy_values
 
     def set_optimiser(self):
         '''
@@ -218,3 +248,95 @@ class TransferLearning:
 
         # Set the modified classifier back to the model
         self.model.classifier = modified_classifier
+
+    def _print_confusion_matrix(self):
+        '''
+        Prints the confusion matrix after training.
+
+        Args:
+            None
+
+        Returns:
+            None
+        '''
+
+        self.model.eval()
+        all_labels = []
+        all_predicted = []
+
+        with torch.no_grad():
+            for inputs, labels in self.val_loader:
+                inputs, labels = inputs.to(self.device), labels.to(self.device)
+                outputs = self.model(inputs)
+                _, predicted = outputs.max(1)
+
+                all_labels.extend(labels.cpu().numpy())
+                all_predicted.extend(predicted.cpu().numpy())
+
+        # Calculate confusion matrix
+        cm = confusion_matrix(all_labels, all_predicted)
+
+        # Plot confusion matrix
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=self.class_names, yticklabels=self.class_names)
+        plt.title('Confusion Matrix')
+        plt.xlabel('Predicted')
+        plt.ylabel('True')
+        plt.show()
+
+    def display_epoch_table(self, table_data):
+        '''
+        Displays a table with epoch, loss, and accuracy using matplotlib.
+
+        Args:
+            table_data (list): List containing lists of epoch, loss, and accuracy for each epoch.
+
+        Returns:
+            None
+        '''
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.axis('tight')
+        ax.axis('off')
+        headers = ['Epoch', 'Loss', 'Accuracy']
+        table = ax.table(cellText=table_data, colLabels=headers, cellLoc='center', loc='center', colColours=['#f3f3f3']*3)
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.scale(1.2, 1.2)
+
+        plt.show()
+
+    def plot_loss_graph(self, loss_values):
+        '''
+        Plots a line graph for loss over epochs.
+
+        Args:
+            loss_values (list): Loss values for each epoch.
+
+        Returns:
+            None
+        '''
+        plt.figure(figsize=(10, 5))
+        plt.plot(range(1, self.num_epochs + 1), loss_values, label='Loss', marker='o')
+        plt.title('Loss Over Epochs')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.show()
+
+    def plot_accuracy_graph(self, accuracy_values):
+        '''
+        Plots a line graph for accuracy over epochs.
+
+        Args:
+            accuracy_values (list): Accuracy values for each epoch.
+
+        Returns:
+            None
+        '''
+        plt.figure(figsize=(10, 5))
+        plt.plot(range(1, self.num_epochs + 1), accuracy_values, label='Accuracy', marker='o', color='green')
+        plt.title('Accuracy Over Epochs')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy (%)')
+        plt.legend()
+        plt.show()
