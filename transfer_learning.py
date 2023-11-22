@@ -114,7 +114,7 @@ class TransferLearning:
             if epoch % 1 == 0:
                 print(f'Epoch {epoch}/{self.num_epochs}, Loss: {loss},Accuracy: {accuracy}%')
 
-        self.print_confusion_matrix()
+        self._print_confusion_matrix()
         # Save the trained model
         # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
 
@@ -223,7 +223,7 @@ class TransferLearning:
         # Set the modified classifier back to the model
         self.model.classifier = modified_classifier
 
-    def print_confusion_matrix(self):
+    def _print_confusion_matrix(self):
         '''
         Prints the confusion matrix after training.
 
