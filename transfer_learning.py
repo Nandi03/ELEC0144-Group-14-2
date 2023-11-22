@@ -98,6 +98,8 @@ class TransferLearning:
             None
         '''
 
+        table_data = []  # List to store epoch, loss, and accuracy for each epoch
+
         for epoch in range(1, self.num_epochs + 1):
             self.model.train()
             for inputs, labels in self.train_loader:
@@ -111,9 +113,11 @@ class TransferLearning:
             # Validation
             accuracy = self._evaluate()
 
-            if epoch % 1 == 0:
-                print(f'Epoch {epoch}/{self.num_epochs}, Loss: {loss},Accuracy: {accuracy}%')
+            # Append data for the current epoch to the table
+            table_data.append([epoch, loss.item(), accuracy])
 
+        # Display the table after training using the new method
+        self._display_epoch_table(table_data)
         self._print_confusion_matrix()
         # Save the trained model
         # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
@@ -256,4 +260,25 @@ class TransferLearning:
         plt.title('Confusion Matrix')
         plt.xlabel('Predicted')
         plt.ylabel('True')
+        plt.show()
+
+    def _display_epoch_table(self, table_data):
+        '''
+        Displays a table with epoch, loss, and accuracy using matplotlib.
+
+        Args:
+            table_data (list): List containing lists of epoch, loss, and accuracy for each epoch.
+
+        Returns:
+            None
+        '''
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.axis('tight')
+        ax.axis('off')
+        headers = ['Epoch', 'Loss', 'Accuracy']
+        table = ax.table(cellText=table_data, colLabels=headers, cellLoc='center', loc='center', colColours=['#f3f3f3']*3)
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.scale(1.2, 1.2)
+
         plt.show()
