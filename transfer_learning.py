@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, optimiser,batch_size, lr=0.01, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
+    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
         
         '''
         Initializes the TransferLearning class with the specified parameters.
@@ -61,8 +61,7 @@ class TransferLearning:
         self.lr = lr
         self.num_layers_to_replace = num_layers_to_replace
         self.num_epochs = num_epochs
-        self.train_path = train_path
-        self.test_path = test_path
+        self.datasetMode = datasetMode
         self.device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') # Move to gpu if available
 
         # Data augmentation and normalization
@@ -217,12 +216,19 @@ class TransferLearning:
             torch.utils.data.DataLoader: DataLoader for validation data.
         '''
 
+        if self.datasetMode == "single":
+            train_path = "task3data/single/train"
+            test_path = "task3data/single/test"
+        elif self.datasetMode == "double":
+            train_path = "task3data/double/train"
+            test_path = "task3data/double/test"
+
         # Load training data
-        train_dataset = datasets.ImageFolder(self.train_path, transform=self.transform)
+        train_dataset = datasets.ImageFolder(train_path, transform=self.transform)
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
 
         # Load validation data
-        val_dataset = datasets.ImageFolder(self.test_path, transform=self.transform)
+        val_dataset = datasets.ImageFolder(test_path, transform=self.transform)
         val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
         return train_loader, val_loader
