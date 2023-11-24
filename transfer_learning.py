@@ -19,39 +19,20 @@ class TransferLearning:
 
         Args:
             model_name (str): Name of the pre-trained model ('alexnet' or 'googlenet').
-            optimiser (str): Name of the optimiser ('adam' or 'sgdm').
-            batch_size (int): Number of samples in each batch for training and validation.
+            optimiser (str): Type of optimiser to use ('adam' or 'sgdm').
+            batch_size (int): Batch size for training and validation.
+            datasetMode (str): Mode of the dataset ('single' or 'double').
             lr (float): Learning rate for the optimiser.
             num_classes (int): Number of classes in the classification task.
-            train_path (str): Path to the training data.
-            test_path (str): Path to the validation data.
-            num_epochs (int): Number of epochs for training.
-            criterion (torch.nn.Module): Loss function for training.
-            momentum (float): Momentum factor for the SGD optimiser.
-            num_layers_to_replace (int): Number of classifier layers to replace in the modified AlexNet.
-
-        Attributes:
-            model_name (str): Name of the pre-trained model.
-            optimiser (str): Name of the optimiser.
-            batch_size (int): Number of samples in each batch.
-            lr (float): Learning rate for the optimiser.
-            num_classes (int): Number of classes.
-            num_layers_to_replace (int): Number of layers to replace in the modified AlexNet.
             num_epochs (int): Number of training epochs.
-            train_path (str): Path to the training data.
-            test_path (str): Path to the validation data.
-            criterion (torch.nn.Module): Loss function.
-            momentum (float): Momentum factor for SGD optimiser.
-            transform (torchvision.transforms.Compose): Data augmentation and normalization transformations.
-            train_loader (torch.utils.data.DataLoader): DataLoader for training data.
-            val_loader (torch.utils.data.DataLoader): DataLoader for validation data.
-            device (torch.device): Device to which the model is moved (GPU or CPU).
-            model (torch.nn.Module): Pre-trained model with modified classifier.
-            optimiser (torch.optim.Optimiser): Optimiser for training.
+            criterion: Loss function.
+            momentum (float): Momentum for the SGD optimiser.
+            num_layers_to_replace (int): Number of classifier layers to replace in the modified AlexNet.
 
         Returns:
             None
         '''
+       
         self.class_names = ["Durian", "Papaya", "Kiwi", "Mangosteen", "Mango"]
         self.model_name = model_name
         self.optimiser = optimiser
@@ -206,14 +187,14 @@ class TransferLearning:
     def _load_data(self):
 
         '''
-        Loads and prepares the training and validation data using ImageFolder.
+        Loads and prepares the training and validation data based on the specified dataset mode.
 
         Args:
             None
 
         Returns:
-            torch.utils.data.DataLoader: DataLoader for training data.
-            torch.utils.data.DataLoader: DataLoader for validation data.
+            DataLoader: Training data loader.
+            DataLoader: Validation data loader.
         '''
 
         if self.datasetMode == "single":
