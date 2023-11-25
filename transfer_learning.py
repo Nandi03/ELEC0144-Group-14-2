@@ -12,46 +12,28 @@ import matplotlib.pyplot as plt
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, optimiser,batch_size, lr=0.01, num_classes=5, train_path = "task3data/train", test_path = "task3data/test", num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
+    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, 
+                 num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
         
         '''
         Initializes the TransferLearning class with the specified parameters.
 
         Args:
             model_name (str): Name of the pre-trained model ('alexnet' or 'googlenet').
-            optimiser (str): Name of the optimiser ('adam' or 'sgdm').
-            batch_size (int): Number of samples in each batch for training and validation.
+            optimiser (str): Type of optimiser to use ('adam' or 'sgdm').
+            batch_size (int): Batch size for training and validation.
+            datasetMode (str): Mode of the dataset ('single' or 'double').
             lr (float): Learning rate for the optimiser.
             num_classes (int): Number of classes in the classification task.
-            train_path (str): Path to the training data.
-            test_path (str): Path to the validation data.
-            num_epochs (int): Number of epochs for training.
-            criterion (torch.nn.Module): Loss function for training.
-            momentum (float): Momentum factor for the SGD optimiser.
-            num_layers_to_replace (int): Number of classifier layers to replace in the modified AlexNet.
-
-        Attributes:
-            model_name (str): Name of the pre-trained model.
-            optimiser (str): Name of the optimiser.
-            batch_size (int): Number of samples in each batch.
-            lr (float): Learning rate for the optimiser.
-            num_classes (int): Number of classes.
-            num_layers_to_replace (int): Number of layers to replace in the modified AlexNet.
             num_epochs (int): Number of training epochs.
-            train_path (str): Path to the training data.
-            test_path (str): Path to the validation data.
-            criterion (torch.nn.Module): Loss function.
-            momentum (float): Momentum factor for SGD optimiser.
-            transform (torchvision.transforms.Compose): Data augmentation and normalization transformations.
-            train_loader (torch.utils.data.DataLoader): DataLoader for training data.
-            val_loader (torch.utils.data.DataLoader): DataLoader for validation data.
-            device (torch.device): Device to which the model is moved (GPU or CPU).
-            model (torch.nn.Module): Pre-trained model with modified classifier.
-            optimiser (torch.optim.Optimiser): Optimiser for training.
+            criterion: Loss function.
+            momentum (float): Momentum for the SGD optimiser.
+            num_layers_to_replace (int): Number of classifier layers to replace in the modified AlexNet.
 
         Returns:
             None
         '''
+       
         self.class_names = ["Durian", "Papaya", "Kiwi", "Mangosteen", "Mango"]
         self.model_name = model_name
         self.optimiser = optimiser
@@ -59,10 +41,10 @@ class TransferLearning:
         self.num_classes = num_classes
         self.batch_size = batch_size
         self.lr = lr
+        self.momentum = momentum
         self.num_layers_to_replace = num_layers_to_replace
         self.num_epochs = num_epochs
-        self.train_path = train_path
-        self.test_path = test_path
+        self.datasetMode = datasetMode
         self.device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') # Move to gpu if available
 
         # Data augmentation and normalization
@@ -207,22 +189,29 @@ class TransferLearning:
     def _load_data(self):
 
         '''
-        Loads and prepares the training and validation data using ImageFolder.
+        Loads and prepares the training and validation data based on the specified dataset mode.
 
         Args:
             None
 
         Returns:
-            torch.utils.data.DataLoader: DataLoader for training data.
-            torch.utils.data.DataLoader: DataLoader for validation data.
+            DataLoader: Training data loader.
+            DataLoader: Validation data loader.
         '''
 
+        if self.datasetMode == "single":
+            train_path = "task3data/single/train"
+            test_path = "task3data/single/test"
+        elif self.datasetMode == "double":
+            train_path = "task3data/double/train"
+            test_path = "task3data/double/test"
+
         # Load training data
-        train_dataset = datasets.ImageFolder(self.train_path, transform=self.transform)
+        train_dataset = datasets.ImageFolder(train_path, transform=self.transform)
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
 
         # Load validation data
-        val_dataset = datasets.ImageFolder(self.test_path, transform=self.transform)
+        val_dataset = datasets.ImageFolder(test_path, transform=self.transform)
         val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
         return train_loader, val_loader
