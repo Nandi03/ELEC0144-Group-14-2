@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
+    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, 
+                 num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
         
         '''
         Initializes the TransferLearning class with the specified parameters.
@@ -40,6 +41,7 @@ class TransferLearning:
         self.num_classes = num_classes
         self.batch_size = batch_size
         self.lr = lr
+        self.momentum = momentum
         self.num_layers_to_replace = num_layers_to_replace
         self.num_epochs = num_epochs
         self.datasetMode = datasetMode
