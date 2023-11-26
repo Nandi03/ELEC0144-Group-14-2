@@ -261,6 +261,7 @@ class Model:
         > An array of the predictions (output y)
 
         '''
+
         predictions = []
         for i in range(len(x)):
             input = x[i]
@@ -271,8 +272,8 @@ class Model:
                 input = output_activated
                 if len(output_activated[0]) == 1:
                     output_activated = np.sum(output_activated)
-                
             predictions.append(output_activated)
+
 
 
         return predictions
