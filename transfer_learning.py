@@ -34,7 +34,7 @@ class TransferLearning:
             None
         '''
        
-        self.class_names = ["Durian", "Papaya", "Kiwi", "Mangosteen", "Mango"]
+        self.class_names = ["Durian", "Kiwi", "Mango", "Mangosteen", "Papaya"]
         self.model_name = model_name
         self.optimiser = optimiser
         self.criterion = criterion
