@@ -6,6 +6,6 @@ alexnet_transfer = TransferLearning(
     batch_size=5,
     lr=0.0001,
     num_epochs=10,
-    datasetMode="double" 
+    datasetMode="single" 
 )
 alexnet_transfer.train()
