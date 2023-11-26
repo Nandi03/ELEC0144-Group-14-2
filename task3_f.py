@@ -1,8 +1,5 @@
 from transfer_learning import TransferLearning
 
-traindata = "task3data/train"
-testdata =  "task3data/test"
-
 # modify 3b parameters
 alexnet_transfer_3b = TransferLearning(
     model_name='alexnet',
@@ -10,8 +7,7 @@ alexnet_transfer_3b = TransferLearning(
     batch_size=5,
     lr=0.0001,
     num_epochs=10,
-    train_path= traindata,
-    test_path=testdata,
+    datasetMode="single"
 )
 alexnet_transfer_3b.train()
 
@@ -23,8 +19,7 @@ alexnet_transfer_3c = TransferLearning(
     lr=0.0001,
     num_epochs=10,
     num_classes=4,
-    train_path= traindata,
-    test_path=testdata,
+    datasetMode="single"
 )
 alexnet_transfer_3c.train()
 
@@ -32,11 +27,10 @@ alexnet_transfer_3c.train()
 googlenet_transfer_3d = TransferLearning(
     model_name='googlenet',
     optimiser="adam",
-    batch_size=5,
+    batch_size=30,
     lr=0.0001,
     num_epochs=10,
-    train_path= traindata,
-    test_path=testdata,
+    datasetMode="single"
 )
 googlenet_transfer_3d.train()
 
@@ -44,10 +38,9 @@ googlenet_transfer_3d.train()
 googlenet_transfer_3e = TransferLearning(
     model_name='googlenet',
     optimiser="adam",
-    batch_size=5,
+    batch_size=30,
     lr=0.0001,
     num_epochs=10,
-    train_path= traindata,
-    test_path=testdata,
+    datasetMode="single"
 )
 googlenet_transfer_3e.train()
