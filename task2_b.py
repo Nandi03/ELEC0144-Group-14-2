@@ -2,6 +2,40 @@ from network import Model, Layer
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+
+def plot_confusion_matrix(model, x, y, num_classes):
+    '''
+    Calculate and plot the confusion matrix for a given model and data.
+
+    Parameters:
+    > model: an instance of the Model class
+    > x: input data
+    > y: true labels
+    > num_classes: number of classes in your classification problem
+
+    Returns:
+    > None
+    '''
+
+    # Get predictions from the model
+    predictions = model.fit(x)
+
+    # Convert predictions to class labels
+    predicted_labels = [np.argmax(pred) for pred in predictions]
+
+    # Calculate confusion matrix
+    cm = confusion_matrix(y, predicted_labels)
+
+    # Plot confusion matrix
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.show()
+
 
 np.random.seed(42)
 
@@ -41,6 +75,9 @@ model.layers.append(Layer("tanh", 5, 3))
 model.layers.append(Layer("linear", 3, 3))
 
 model.compile(x_train, y_train)
+
+num_classes = 3
+plot_confusion_matrix(model, x_test, y_test, num_classes)
 
 predictions = model.fit(x_test)
 
