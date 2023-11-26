@@ -34,7 +34,7 @@ class TransferLearning:
             None
         '''
        
-        self.class_names = ["Durian", "Papaya", "Kiwi", "Mangosteen", "Mango"]
+        self.class_names = ["Durian", "Kiwi", "Mango", "Mangosteen", "Papaya"]
         self.model_name = model_name
         self.optimiser = optimiser
         self.criterion = criterion
@@ -202,9 +202,9 @@ class TransferLearning:
         if self.datasetMode == "single":
             train_path = "task3data/single/train"
             test_path = "task3data/single/test"
-        elif self.datasetMode == "double":
-            train_path = "task3data/double/train"
-            test_path = "task3data/double/test"
+        elif self.datasetMode == "multiple":
+            train_path = "task3data/multiple/train"
+            test_path = "task3data/multiple/test"
 
         # Load training data
         train_dataset = datasets.ImageFolder(train_path, transform=self.transform)
