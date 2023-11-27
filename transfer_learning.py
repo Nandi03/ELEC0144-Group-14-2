@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1, train_test_split="70:30"):
+    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, num_epochs=100, 
+                criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=3, train_test_split="70:30"):
         
         '''
         Initializes the TransferLearning class with the specified parameters.
@@ -59,10 +60,10 @@ class TransferLearning:
         self.train_loader, self.val_loader = self._load_data()
 
         # Load pre-trained model
-        self.use_pretrained_model()
+        self._use_pretrained_model()
 
         # Set up optimiser and loss function
-        self.set_optimiser()
+        self._set_optimiser()
 
         # Move model to device
         self.model = self.model.to(self.device)
@@ -80,13 +81,13 @@ class TransferLearning:
             loss_values, accuracy_values = self._train_and_evaluate()
 
             # Display line graph for loss over epochs
-            self.plot_loss_graph(loss_values)
+            self._plot_loss_graph(loss_values)
 
             # Display line graph for accuracy over epochs
-            self.plot_accuracy_graph(accuracy_values)
+            self._plot_accuracy_graph(accuracy_values)
 
             # Display the table after training using the new method
-            self.display_epoch_table(list(zip(range(1, self.num_epochs + 1), loss_values, accuracy_values)))
+            self._display_epoch_table(list(zip(range(1, self.num_epochs + 1), loss_values, accuracy_values)))
 
             self._print_confusion_matrix()
             # Save the trained model
@@ -126,7 +127,7 @@ class TransferLearning:
 
         return loss_values, accuracy_values
 
-    def set_optimiser(self):
+    def _set_optimiser(self):
         '''
         Sets the optimiser for the model.
 
@@ -141,7 +142,7 @@ class TransferLearning:
         elif self.optimiser == "sgdm":
             self.optimiser = optim.SGD(self.model.parameters(), lr=self.lr, momentum=self.momentum)
 
-    def use_pretrained_model(self):
+    def _use_pretrained_model(self):
         '''
         Sets the model to either AlexNet or GoogLeNet and modifies the classifier layers for AlexNet.
 
@@ -284,7 +285,7 @@ class TransferLearning:
         plt.ylabel('True')
         plt.show()
 
-    def display_epoch_table(self, table_data):
+    def _display_epoch_table(self, table_data):
         '''
         Displays a table with epoch, loss, and accuracy using matplotlib.
 
@@ -305,7 +306,7 @@ class TransferLearning:
 
         plt.show()
 
-    def plot_loss_graph(self, loss_values):
+    def _plot_loss_graph(self, loss_values):
         '''
         Plots a line graph for loss over epochs.
 
@@ -323,7 +324,7 @@ class TransferLearning:
         plt.legend()
         plt.show()
 
-    def plot_accuracy_graph(self, accuracy_values):
+    def _plot_accuracy_graph(self, accuracy_values):
         '''
         Plots a line graph for accuracy over epochs.
 
