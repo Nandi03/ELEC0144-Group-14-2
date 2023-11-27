@@ -20,15 +20,16 @@ class TransferLearning:
 
         Args:
             model_name (str): Name of the pre-trained model ('alexnet' or 'googlenet').
-            optimiser (str): Type of optimiser to use ('adam' or 'sgdm').
+            optimiser (str): Type of optimizer to use ('adam' or 'sgdm').
             batch_size (int): Batch size for training and validation.
-            datasetMode (str): Mode of the dataset ('single' or 'double').
-            lr (float): Learning rate for the optimiser.
+            dataset_mode (str): Mode of the dataset ('single' or 'double').
+            lr (float): Learning rate for the optimizer.
             num_classes (int): Number of classes in the classification task.
             num_epochs (int): Number of training epochs.
             criterion: Loss function.
-            momentum (float): Momentum for the SGD optimiser.
+            momentum (float): Momentum for the SGD optimizer.
             num_layers_to_replace (int): Number of classifier layers to replace in the modified AlexNet.
+            train_test_split (str): Ratio for training and testing data split, e.g., "70:30".
 
         Returns:
             None
