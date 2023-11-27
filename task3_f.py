@@ -7,7 +7,8 @@ alexnet_transfer_3b = TransferLearning(
     batch_size=5,
     lr=0.0001,
     num_epochs=10,
-    datasetMode="single"
+    datasetMode="single",
+    train_test_split="70:30" 
 )
 alexnet_transfer_3b.train()
 
@@ -18,8 +19,9 @@ alexnet_transfer_3c = TransferLearning(
     batch_size=5,
     lr=0.0001,
     num_epochs=10,
-    num_classes=4,
-    datasetMode="single"
+    num_layers_to_replace=4,
+    datasetMode="single",
+    train_test_split="70:30" 
 )
 alexnet_transfer_3c.train()
 
@@ -30,7 +32,8 @@ googlenet_transfer_3d = TransferLearning(
     batch_size=30,
     lr=0.0001,
     num_epochs=10,
-    datasetMode="single"
+    datasetMode="single",
+    train_test_split="60:40" 
 )
 googlenet_transfer_3d.train()
 
@@ -41,6 +44,7 @@ googlenet_transfer_3e = TransferLearning(
     batch_size=30,
     lr=0.0001,
     num_epochs=10,
-    datasetMode="single"
+    datasetMode="single",
+    train_test_split="70:30" 
 )
 googlenet_transfer_3e.train()

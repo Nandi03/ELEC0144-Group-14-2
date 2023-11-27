@@ -12,8 +12,7 @@ import matplotlib.pyplot as plt
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, 
-                 num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
+    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1, train_test_split="70:30"):
         
         '''
         Initializes the TransferLearning class with the specified parameters.
@@ -45,6 +44,7 @@ class TransferLearning:
         self.num_layers_to_replace = num_layers_to_replace
         self.num_epochs = num_epochs
         self.datasetMode = datasetMode
+        self.train_test_split = train_test_split
         self.device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') # Move to gpu if available
 
         # Data augmentation and normalization
@@ -200,11 +200,22 @@ class TransferLearning:
         '''
 
         if self.datasetMode == "single":
-            train_path = "task3data/single/train"
-            test_path = "task3data/single/test"
+            if self.train_test_split == "70:30":
+                train_path = "task3_70:30_split/single/train"
+                test_path = "task3_70:30_split/single/test"
+
+            elif self.train_test_split == "60:40":
+                train_path = "task3_60:40_split/single/train"
+                test_path = "task3_60:40_split/single/test"
+
         elif self.datasetMode == "multiple":
-            train_path = "task3data/multiple/train"
-            test_path = "task3data/multiple/test"
+            if self.train_test_split == "70:30":
+                train_path = "task3_70:30_split/multiple/train"
+                test_path = "task3_70:30_split/multiple/test"
+
+            elif self.train_test_split == "60:40":
+                train_path = "task3_60:40_split/multiple/train"
+                test_path = "task3_60:40_split/multiple/test"
 
         # Load training data
         train_dataset = datasets.ImageFolder(train_path, transform=self.transform)

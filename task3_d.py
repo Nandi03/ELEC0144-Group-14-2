@@ -6,7 +6,7 @@ googlenet_transfer = TransferLearning(
     batch_size=30,
     lr=0.0001,
     num_epochs=10,
-    datasetMode="multiple"
-
+    datasetMode="multiple",
+    train_test_split="70:30" 
 )
 googlenet_transfer.train()
