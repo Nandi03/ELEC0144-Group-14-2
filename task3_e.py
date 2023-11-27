@@ -1,15 +1,12 @@
 from transfer_learning import TransferLearning
 
-traindata = "task3data/train"
-testdata =  "task3data/test"
-
 googlenet_transfer = TransferLearning(
     model_name='googlenet',
     optimiser="adam",
-    batch_size=5,
-    lr=0.0001,
+    batch_size=30,
+    lr=0.0005,
     num_epochs=10,
-    train_path= traindata,
-    test_path=testdata,
+    datasetMode="multiple",
+    train_test_split="60:40" 
 )
 googlenet_transfer.train()
