@@ -126,8 +126,8 @@ class Model:
                     v_W1_hat = self.layers[j].v_W  / (1 - self.betas[1]**(i+1))
                     v_B1_hat =self.layers[j].v_B / (1 - self.betas[1]**(i+1))
                 
-                    self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat) + self.epsilon)
-                    self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
+                    self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat + self.epsilon))
+                    self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat + self.epsilon))
                 cost += float(np.sum(loss))
             cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
@@ -191,8 +191,8 @@ class Model:
                     self.layers[j].bias_velocity  += np.sum(output_grad**2)
 
                     # Update weights and biases using Adagrad
-                    self.layers[j].weights -= (self.learning_rate / (np.sqrt(self.layers[j].velocity) + self.epsilon)) * np.outer(input[j], output_grad)
-                    self.layers[j].bias -= (self.learning_rate / (np.sqrt(self.layers[j].bias_velocity) + self.epsilon)) * output_grad
+                    self.layers[j].weights -= (self.learning_rate / (np.sqrt(self.layers[j].velocity+ self.epsilon))) * np.outer(input[j], output_grad)
+                    self.layers[j].bias -= (self.learning_rate / (np.sqrt(self.layers[j].bias_velocity + self.epsilon))) * output_grad
                 cost += float(np.sum(loss))
             cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
