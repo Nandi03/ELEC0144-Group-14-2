@@ -2,9 +2,10 @@ from network import Model, Layer
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 
-
-np.random.seed(40)
+np.random.seed(42)
 
 # Read data from the text file into a pandas DataFrame
 data = pd.read_csv('IrisData.txt', header=None, names=['col1', 'col2', 'col3', 'col4', 'class'])
@@ -36,10 +37,12 @@ model = Model(learning_rate=0.001, epochs=5000, optimizer="sgd", one_hot=True)
 #model.momentum = 0.3
 
 # relu hidden layer
-model.layers.append(Layer("relu", 4, 5))
-model.layers.append(Layer("relu", 5, 3))
-model.layers.append(Layer("linear", 3, 3))
+model.layers.append(Layer("leaky_relu", 4, 5))
+model.layers[0].alpha = 0.2
+model.layers.append(Layer("leaky_relu", 5, 3))
+model.layers[1].alpha = 0.7
 
+model.layers.append(Layer("linear", 3, 3))
 
 model.compile(x_train, y_train)
 
@@ -74,4 +77,15 @@ plt.ylabel('Mean Squared Error')
 plt.title('Training Loss Curve')
 plt.legend()
 plt.grid(True)
+plt.show()
+
+cm = confusion_matrix(y_test, predictions)
+num_classes = 3
+
+# Plot confusion matrix
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('True')
 plt.show()

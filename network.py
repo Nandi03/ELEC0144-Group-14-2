@@ -66,6 +66,7 @@ class Model:
         Train the model using Stochastic Gradient Descent.
         '''
         for epoch in range(self.epochs):
+            cost = 0
             for i in range(len(x)):
                 # Forward pass
                 y, v_j, input = self.forward(x[i])
@@ -83,8 +84,9 @@ class Model:
 
                     self.layers[j].weights -= self.learning_rate * np.outer(input[j], output_grad) 
                     self.layers[j].bias -= self.learning_rate * output_grad
-            # Append loss every epoch for plotting and tracking learning progress
-            self.history.append(float(np.sum(loss)))
+                cost += float(np.sum(cost))
+            # Append cost every epoch for plotting and tracking learning progress
+            self.history.append(cost)
 
     def adam(self, x, d):
         '''
@@ -93,6 +95,7 @@ class Model:
         if len(self.betas) != 2:
             raise IndexError
         for epoch in range(self.epochs):
+            cost = 0
             for i in range(len(x)):
                 y, v_j, input = self.forward(x[i])
 
@@ -124,14 +127,16 @@ class Model:
                 
                     self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat) + self.epsilon)
                     self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
-            # Append loss every epoch for plotting and tracking learning progress
-            self.history.append(float(np.sum(loss)))
+                cost += float(np.sum(loss))
+            # Append cost every epoch for plotting and tracking learning progress
+            self.history.append(cost)
 
     def sgd_momentum(self, x, d):
         '''
         Train the model using Stochastic Gradient Descent with Momentum.
         '''
         for epoch in range(self.epochs):
+            cost = 0
             for i in range(len(x)):
                 # Forward pass
                 y, v_j, input = self.forward(x[i])
@@ -153,9 +158,9 @@ class Model:
                     # Update weights and biases using momentum
                     self.layers[j].weights -= self.layers[j].velocity
                     self.layers[j].bias -= self.layers[j].bias_velocity
-
-            # Append loss every 100 epochs for plotting and tracking learning progress
-            self.history.append(float(np.sum(loss)))
+                cost += float(np.sum(loss))
+            # Append cost every epoch for plotting and tracking learning progress
+            self.history.append(cost)
 
         
     def sgd_adaptive(self, x, d):
@@ -163,6 +168,7 @@ class Model:
         Train the model using Stochastic Gradient Descent with Adaptive Learning Rate.
         '''
         for epoch in range(self.epochs):
+            cost = 0
             for i in range(len(x)):
                 # Forward pass
                 y, v_j, input = self.forward(x[i])
@@ -184,8 +190,9 @@ class Model:
                     # Update weights and biases using Adagrad
                     self.layers[j].weights -= (self.learning_rate / (np.sqrt(self.layers[j].velocity) + self.epsilon)) * np.outer(input[j], output_grad)
                     self.layers[j].bias -= (self.learning_rate / (np.sqrt(self.layers[j].bias_velocity) + self.epsilon)) * output_grad
-            # Append loss every 100 epochs for plotting and tracking learning progress
-            self.history.append(float(np.sum(loss)))
+                cost += float(np.sum(loss))
+            # Append cost every epoch for plotting and tracking learning progress
+            self.history.append(cost)
 
     def forward(self, x):
         ''' 
@@ -334,13 +341,13 @@ class Layer:
             return 1 / (1 + np.exp(-x))
         
         elif self.activation == "relu":
-            return np.maximum(0, x)
+            return np.maximum(np.zeros_like(x), x)
         
         elif self.activation == "linear":
             return x
         
         elif self.activation == "leaky_relu":
-            return np.where(x > 0, x, self.alpha * x)
+            return np.where(x > np.zeros_like(x), x, self.alpha * x)
         
         elif self.activation == "tanh":
             return np.tanh(x)
@@ -365,13 +372,13 @@ class Layer:
             return self.get_activation(x) * (1 - self.get_activation(x))
         
         elif self.activation == "relu":
-            return np.where(x > 0, 1, 0)
+            return np.where(x > np.zeros_like(x), 1, 0)
         
         elif self.activation == "linear":
             return 1
         
         elif self.activation == "leaky_relu":
-            return np.where(x > 0, 1, self.alpha)
+            return np.where(x > np.zeros_like(x), 1, self.alpha)
         
         elif self.activation == "tanh":
             return 1.0 - np.tanh(x)**2

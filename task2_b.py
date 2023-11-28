@@ -67,17 +67,16 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.0001, optimizer="sgd", one_hot=True, epochs=5000)
+model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=6000)
 #model.momentum = 0.3
 
-model.layers.append(Layer("tanh", 4,5))
-model.layers.append(Layer("tanh", 5, 3))
+model.layers.append(Layer("tanh", 4,3))
+model.layers.append(Layer("tanh", 3, 3))
 model.layers.append(Layer("linear", 3, 3))
 
 model.compile(x_train, y_train)
 
 num_classes = 3
-plot_confusion_matrix(model, x_test, y_test, num_classes)
 
 predictions = model.fit(x_test)
 
@@ -111,4 +110,15 @@ plt.ylabel('Mean Squared Error')
 plt.title('Training Loss Curve')
 plt.legend()
 plt.grid(True)
+plt.show()
+
+ # Calculate confusion matrix
+cm = confusion_matrix(y_test, predictions)
+
+# Plot confusion matrix
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('True')
 plt.show()
