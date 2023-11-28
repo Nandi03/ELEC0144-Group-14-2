@@ -19,7 +19,7 @@ model.compile(x_train, d_train)
 
 x_test = np.arange(-0.97, 0.93, 0.1)
 y_test = 0.8* x_test**3 + 0.3 * x_test**2 - 0.4*x_test
-predictions = model.fit(x_test)
+predictions = model.fit(x_test, y_test)
 
  # Plot the training data, true cubic function, and predictions
 plt.figure(figsize=(8, 6))
@@ -33,7 +33,7 @@ plt.grid(True)
 plt.show()
 
 plt.figure(figsize=(8, 6))
-plt.plot(model.history, color='blue', label='Training Loss')
+plt.plot(model.history['train'], color='blue', label='Training Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Mean Squared Error')
 plt.title('Training Loss Curve')

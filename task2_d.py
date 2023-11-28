@@ -45,7 +45,7 @@ model.layers.append(Layer("linear", 3, 3))
 
 model.compile(x_train, y_train)
 
-predictions = model.fit(x_test)
+predictions = model.fit(x_test, y_test)
 predictions = np.argmax(np.array([arr[0] for arr in predictions]), axis=1) # use this when using one-hot encoding
 #predictions = [round(max(arr[0])) for arr in predictions] # use this when not using one-hot encoding.
 # Plot the training data, true cubic function, and predictions
@@ -70,10 +70,19 @@ plt.grid(True)
 plt.show()
 
 plt.figure(figsize=(8, 6))
-plt.plot(model.history, color='blue', label='Training Loss')
+plt.plot(model.history['train'], color='blue', label='Training Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Mean Squared Error')
 plt.title('Training Loss Curve')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(8, 6))
+plt.plot(model.history['test'], color='blue', label='Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Mean Squared Error')
+plt.title('Testing Loss Curve')
 plt.legend()
 plt.grid(True)
 plt.show()

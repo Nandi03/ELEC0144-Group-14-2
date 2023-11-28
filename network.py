@@ -44,7 +44,7 @@ class Model:
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.optimizer = optimizer
-        self.history = []  # training loss
+        self.history = {'train':[], 'test':[]}  # training loss
         self.betas = [0.9, 0.99]
         self.epsilon = 1e-8
         self.momentum = 0.5 # a constant between 0 and 1
@@ -87,7 +87,7 @@ class Model:
                 cost += float(np.sum(loss))
             cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
-            self.history.append(cost)
+            self.history['train'].append(cost)
 
     def adam(self, x, d):
         '''
@@ -131,7 +131,7 @@ class Model:
                 cost += float(np.sum(loss))
             cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
-            self.history.append(cost)
+            self.history['train'].append(cost)
 
     def sgd_momentum(self, x, d):
         '''
@@ -163,7 +163,7 @@ class Model:
                 cost += float(np.sum(loss))
             cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
-            self.history.append(cost)
+            self.history['train'].append(cost)
 
         
     def sgd_adaptive(self, x, d):
@@ -196,7 +196,7 @@ class Model:
                 cost += float(np.sum(loss))
             cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
-            self.history.append(cost)
+            self.history['train'].append(cost)
 
     def forward(self, x):
         ''' 
@@ -261,7 +261,7 @@ class Model:
         
         return predicted - actual
 
-    def fit(self, x):
+    def fit(self, x, y):
         ''' 
         Given x-values from a testing data set, predicts the d-values using the model after training.
 
@@ -281,8 +281,11 @@ class Model:
                 x_out = (np.dot(input, self.layers[j].weights) + self.layers[j].bias) 
                 output_activated = self.layers[j].get_activation(x_out)
                 input = output_activated
-                if len(output_activated[0]) == 1:
-                    output_activated = np.sum(output_activated)
+            
+            loss = self.mse(y[i], output_activated)
+            self.history['test'].append(float(np.sum(loss)))
+            if len(output_activated[0]) == 1:
+                output_activated = np.sum(output_activated)
             predictions.append(output_activated)
 
         return predictions
