@@ -41,7 +41,6 @@ model.layers.append(Layer("leaky_relu", 4, 5))
 model.layers[0].alpha = 0.2
 model.layers.append(Layer("leaky_relu", 5, 3))
 model.layers[1].alpha = 0.7
-
 model.layers.append(Layer("linear", 3, 3))
 
 model.compile(x_train, y_train)

@@ -84,7 +84,8 @@ class Model:
 
                     self.layers[j].weights -= self.learning_rate * np.outer(input[j], output_grad) 
                     self.layers[j].bias -= self.learning_rate * output_grad
-                cost += float(np.sum(cost))
+                cost += float(np.sum(loss))
+            cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
             self.history.append(cost)
 
@@ -128,6 +129,7 @@ class Model:
                     self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat) + self.epsilon)
                     self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
                 cost += float(np.sum(loss))
+            cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
             self.history.append(cost)
 
@@ -159,6 +161,7 @@ class Model:
                     self.layers[j].weights -= self.layers[j].velocity
                     self.layers[j].bias -= self.layers[j].bias_velocity
                 cost += float(np.sum(loss))
+            cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
             self.history.append(cost)
 
@@ -191,6 +194,7 @@ class Model:
                     self.layers[j].weights -= (self.learning_rate / (np.sqrt(self.layers[j].velocity) + self.epsilon)) * np.outer(input[j], output_grad)
                     self.layers[j].bias -= (self.learning_rate / (np.sqrt(self.layers[j].bias_velocity) + self.epsilon)) * output_grad
                 cost += float(np.sum(loss))
+            cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
             self.history.append(cost)
 
@@ -280,8 +284,6 @@ class Model:
                 if len(output_activated[0]) == 1:
                     output_activated = np.sum(output_activated)
             predictions.append(output_activated)
-
-
 
         return predictions
 

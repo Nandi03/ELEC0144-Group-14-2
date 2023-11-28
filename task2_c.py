@@ -59,7 +59,6 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-
 error = y_test - predictions
 plt.figure(figsize=(8, 6))
 plt.plot(error,  color='red', label='Error')
