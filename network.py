@@ -31,7 +31,9 @@ class Model:
     > momentum
         - used for sgd-momentum
     > history
-        - an array updated every 100 epochs with the training loss
+        - a dictionary which stores the progress of training by the loss for training and testing
+        - access the loss for every epoch during training with self.history['train']
+        - access the loss for every sample in testing set with self.history['test']
     
     
     '''
