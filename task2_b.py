@@ -5,38 +5,6 @@ import pandas as pd
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
-def plot_confusion_matrix(model, x, y, num_classes):
-    '''
-    Calculate and plot the confusion matrix for a given model and data.
-
-    Parameters:
-    > model: an instance of the Model class
-    > x: input data
-    > y: true labels
-    > num_classes: number of classes in your classification problem
-
-    Returns:
-    > None
-    '''
-
-    # Get predictions from the model
-    predictions = model.fit(x)
-
-    # Convert predictions to class labels
-    predicted_labels = [np.argmax(pred) for pred in predictions]
-
-    # Calculate confusion matrix
-    cm = confusion_matrix(y, predicted_labels)
-
-    # Plot confusion matrix
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
-    plt.title('Confusion Matrix')
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
-    plt.show()
-
-
 np.random.seed(42)
 
 # Read data from the text file into a pandas DataFrame
@@ -67,19 +35,16 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.0001, optimizer="sgd", one_hot=True, epochs=5000)
+model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=7000)
 #model.momentum = 0.3
 
-model.layers.append(Layer("tanh", 4,5))
-model.layers.append(Layer("tanh", 5, 3))
+model.layers.append(Layer("tanh", 4,3))
+model.layers.append(Layer("tanh", 3, 3))
 model.layers.append(Layer("linear", 3, 3))
 
 model.compile(x_train, y_train)
-
 num_classes = 3
-plot_confusion_matrix(model, x_test, y_test, num_classes)
-
-predictions = model.fit(x_test)
+predictions = model.fit(x_test, y_test)
 
 predictions = np.argmax(np.array([arr[0] for arr in predictions]), axis=1) # use this when using one-hot encoding
 #predictions = [round(i) for i in predictions] # use this when not using one-hot encoding.
@@ -105,10 +70,30 @@ plt.grid(True)
 plt.show()
 
 plt.figure(figsize=(8, 6))
-plt.plot(model.history, color='blue', label='Training Loss')
+plt.plot(model.history['train'], color='blue', label='Training Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Mean Squared Error')
 plt.title('Training Loss Curve')
 plt.legend()
 plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(8, 6))
+plt.plot(model.history['test'], color='blue', label='Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Mean Squared Error')
+plt.title('Testing Loss Curve')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+cm = confusion_matrix(y_test, predictions)
+num_classes = 3
+
+# Plot confusion matrix
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('True')
 plt.show()

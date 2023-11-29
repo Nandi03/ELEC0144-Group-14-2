@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import confusion_matrix
-
+import seaborn as sns
 
 np.random.seed(42)
 
@@ -35,11 +35,11 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.0001, optimizer="sgd", one_hot=True, epochs=5000)
+model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=5000)
 #model.momentum = 0.3
 
 model.layers.append(Layer("tanh", 4,20))
-model.layers.append(Layer("tanh", 20, 20))
+model.layers.append(Layer("relu", 20, 20))
 model.layers.append(Layer("linear", 20, 3))
 
 model.compile(x_train, y_train)
@@ -61,7 +61,6 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-
 error = y_test - predictions
 plt.figure(figsize=(8, 6))
 plt.plot(error,  color='red', label='Error')
@@ -73,10 +72,30 @@ plt.grid(True)
 plt.show()
 
 plt.figure(figsize=(8, 6))
-plt.plot(model.history, color='blue', label='Training Loss')
+plt.plot(model.history['train'], color='blue', label='Training Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Mean Squared Error')
 plt.title('Training Loss Curve')
 plt.legend()
 plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(8, 6))
+plt.plot(model.history['test'], color='blue', label='Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Mean Squared Error')
+plt.title('Testing Loss Curve')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+cm = confusion_matrix(y_test, predictions)
+num_classes = 3
+
+# Plot confusion matrix
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('True')
 plt.show()

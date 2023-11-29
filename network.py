@@ -44,7 +44,7 @@ class Model:
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.optimizer = optimizer
-        self.history = []  # training loss
+        self.history = {'train':[], 'test':[]}  # training loss
         self.betas = [0.9, 0.99]
         self.epsilon = 1e-8
         self.momentum = 0.5 # a constant between 0 and 1
@@ -66,6 +66,7 @@ class Model:
         Train the model using Stochastic Gradient Descent.
         '''
         for epoch in range(self.epochs):
+            cost = 0
             for i in range(len(x)):
                 # Forward pass
                 y, v_j, input = self.forward(x[i])
@@ -83,8 +84,10 @@ class Model:
 
                     self.layers[j].weights -= self.learning_rate * np.outer(input[j], output_grad) 
                     self.layers[j].bias -= self.learning_rate * output_grad
-            # Append loss every epoch for plotting and tracking learning progress
-            self.history.append(float(np.sum(loss)))
+                cost += float(np.sum(loss))
+            cost /= len(x)
+            # Append cost every epoch for plotting and tracking learning progress
+            self.history['train'].append(cost)
 
     def adam(self, x, d):
         '''
@@ -93,6 +96,7 @@ class Model:
         if len(self.betas) != 2:
             raise IndexError
         for epoch in range(self.epochs):
+            cost = 0
             for i in range(len(x)):
                 y, v_j, input = self.forward(x[i])
 
@@ -122,16 +126,19 @@ class Model:
                     v_W1_hat = self.layers[j].v_W  / (1 - self.betas[1]**(i+1))
                     v_B1_hat =self.layers[j].v_B / (1 - self.betas[1]**(i+1))
                 
-                    self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat) + self.epsilon)
-                    self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat) + self.epsilon)
-            # Append loss every epoch for plotting and tracking learning progress
-            self.history.append(float(np.sum(loss)))
+                    self.layers[j].weights -= self.learning_rate * m_W1_hat / (np.sqrt(v_W1_hat + self.epsilon))
+                    self.layers[j].bias -= self.learning_rate * m_B1_hat / (np.sqrt(v_B1_hat + self.epsilon))
+                cost += float(np.sum(loss))
+            cost /= len(x)
+            # Append cost every epoch for plotting and tracking learning progress
+            self.history['train'].append(cost)
 
     def sgd_momentum(self, x, d):
         '''
         Train the model using Stochastic Gradient Descent with Momentum.
         '''
         for epoch in range(self.epochs):
+            cost = 0
             for i in range(len(x)):
                 # Forward pass
                 y, v_j, input = self.forward(x[i])
@@ -153,9 +160,10 @@ class Model:
                     # Update weights and biases using momentum
                     self.layers[j].weights -= self.layers[j].velocity
                     self.layers[j].bias -= self.layers[j].bias_velocity
-
-            # Append loss every 100 epochs for plotting and tracking learning progress
-            self.history.append(float(np.sum(loss)))
+                cost += float(np.sum(loss))
+            cost /= len(x)
+            # Append cost every epoch for plotting and tracking learning progress
+            self.history['train'].append(cost)
 
         
     def sgd_adaptive(self, x, d):
@@ -163,6 +171,7 @@ class Model:
         Train the model using Stochastic Gradient Descent with Adaptive Learning Rate.
         '''
         for epoch in range(self.epochs):
+            cost = 0
             for i in range(len(x)):
                 # Forward pass
                 y, v_j, input = self.forward(x[i])
@@ -182,10 +191,12 @@ class Model:
                     self.layers[j].bias_velocity  += np.sum(output_grad**2)
 
                     # Update weights and biases using Adagrad
-                    self.layers[j].weights -= (self.learning_rate / (np.sqrt(self.layers[j].velocity) + self.epsilon)) * np.outer(input[j], output_grad)
-                    self.layers[j].bias -= (self.learning_rate / (np.sqrt(self.layers[j].bias_velocity) + self.epsilon)) * output_grad
-            # Append loss every 100 epochs for plotting and tracking learning progress
-            self.history.append(float(np.sum(loss)))
+                    self.layers[j].weights -= (self.learning_rate / (np.sqrt(self.layers[j].velocity+ self.epsilon))) * np.outer(input[j], output_grad)
+                    self.layers[j].bias -= (self.learning_rate / (np.sqrt(self.layers[j].bias_velocity + self.epsilon))) * output_grad
+                cost += float(np.sum(loss))
+            cost /= len(x)
+            # Append cost every epoch for plotting and tracking learning progress
+            self.history['train'].append(cost)
 
     def forward(self, x):
         ''' 
@@ -250,7 +261,7 @@ class Model:
         
         return predicted - actual
 
-    def fit(self, x):
+    def fit(self, x, y):
         ''' 
         Given x-values from a testing data set, predicts the d-values using the model after training.
 
@@ -270,11 +281,12 @@ class Model:
                 x_out = (np.dot(input, self.layers[j].weights) + self.layers[j].bias) 
                 output_activated = self.layers[j].get_activation(x_out)
                 input = output_activated
-                if len(output_activated[0]) == 1:
-                    output_activated = np.sum(output_activated)
+            
+            loss = self.mse(y[i], output_activated)
+            self.history['test'].append(float(np.sum(loss)))
+            if len(output_activated[0]) == 1:
+                output_activated = np.sum(output_activated)
             predictions.append(output_activated)
-
-
 
         return predictions
 
@@ -334,13 +346,13 @@ class Layer:
             return 1 / (1 + np.exp(-x))
         
         elif self.activation == "relu":
-            return np.maximum(0, x)
+            return np.maximum(np.zeros_like(x), x)
         
         elif self.activation == "linear":
             return x
         
         elif self.activation == "leaky_relu":
-            return np.where(x > 0, x, self.alpha * x)
+            return np.where(x > np.zeros_like(x), x, self.alpha * x)
         
         elif self.activation == "tanh":
             return np.tanh(x)
@@ -365,13 +377,13 @@ class Layer:
             return self.get_activation(x) * (1 - self.get_activation(x))
         
         elif self.activation == "relu":
-            return np.where(x > 0, 1, 0)
+            return np.where(x > np.zeros_like(x), 1, 0)
         
         elif self.activation == "linear":
             return 1
         
         elif self.activation == "leaky_relu":
-            return np.where(x > 0, 1, self.alpha)
+            return np.where(x > np.zeros_like(x), 1, self.alpha)
         
         elif self.activation == "tanh":
             return 1.0 - np.tanh(x)**2
