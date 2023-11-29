@@ -82,15 +82,15 @@ class TransferLearning:
             loss_values, accuracy_values = self._train_and_evaluate()
 
             # Display line graph for loss over epochs
-            self._plot_loss_graph(loss_values)
+            # self._plot_loss_graph(loss_values)
 
             # Display line graph for accuracy over epochs
-            self._plot_accuracy_graph(accuracy_values)
+            # self._plot_accuracy_graph(accuracy_values)
 
             # Display the table after training using the new method
             self._display_epoch_table(list(zip(range(1, self.num_epochs + 1), loss_values, accuracy_values)))
 
-            self._print_confusion_matrix()
+            # self._print_confusion_matrix()
             # Save the trained model
             # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
 
@@ -299,7 +299,7 @@ class TransferLearning:
         fig, ax = plt.subplots(figsize=(8, 6))
         ax.axis('tight')
         ax.axis('off')
-        headers = ['Epoch', 'Loss', 'Accuracy']
+        headers = ['Epoch', 'Loss', 'Accuracy (%)']
         table = ax.table(cellText=table_data, colLabels=headers, cellLoc='center', loc='center', colColours=['#f3f3f3']*3)
         table.auto_set_font_size(False)
         table.set_fontsize(10)
