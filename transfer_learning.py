@@ -12,23 +12,24 @@ import matplotlib.pyplot as plt
 torch.manual_seed(42)
 
 class TransferLearning:
-    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, 
-                 num_epochs=100, criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=1):
+    def __init__(self, model_name, optimiser,batch_size, datasetMode,lr=0.01, num_classes=5, num_epochs=100, 
+                criterion=nn.CrossEntropyLoss(), momentum=0.9, num_layers_to_replace=3, train_test_split="70:30"):
         
         '''
         Initializes the TransferLearning class with the specified parameters.
 
         Args:
             model_name (str): Name of the pre-trained model ('alexnet' or 'googlenet').
-            optimiser (str): Type of optimiser to use ('adam' or 'sgdm').
+            optimiser (str): Type of optimizer to use ('adam' or 'sgdm').
             batch_size (int): Batch size for training and validation.
-            datasetMode (str): Mode of the dataset ('single' or 'double').
-            lr (float): Learning rate for the optimiser.
+            dataset_mode (str): Mode of the dataset ('single' or 'double').
+            lr (float): Learning rate for the optimizer.
             num_classes (int): Number of classes in the classification task.
             num_epochs (int): Number of training epochs.
             criterion: Loss function.
-            momentum (float): Momentum for the SGD optimiser.
+            momentum (float): Momentum for the SGD optimizer.
             num_layers_to_replace (int): Number of classifier layers to replace in the modified AlexNet.
+            train_test_split (str): Ratio for training and testing data split, e.g., "70:30".
 
         Returns:
             None
@@ -45,6 +46,7 @@ class TransferLearning:
         self.num_layers_to_replace = num_layers_to_replace
         self.num_epochs = num_epochs
         self.datasetMode = datasetMode
+        self.train_test_split = train_test_split
         self.device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu') # Move to gpu if available
 
         # Data augmentation and normalization
@@ -59,10 +61,10 @@ class TransferLearning:
         self.train_loader, self.val_loader = self._load_data()
 
         # Load pre-trained model
-        self.use_pretrained_model()
+        self._use_pretrained_model()
 
         # Set up optimiser and loss function
-        self.set_optimiser()
+        self._set_optimiser()
 
         # Move model to device
         self.model = self.model.to(self.device)
@@ -80,13 +82,13 @@ class TransferLearning:
             loss_values, accuracy_values = self._train_and_evaluate()
 
             # Display line graph for loss over epochs
-            self.plot_loss_graph(loss_values)
+            self._plot_loss_graph(loss_values)
 
             # Display line graph for accuracy over epochs
-            self.plot_accuracy_graph(accuracy_values)
+            self._plot_accuracy_graph(accuracy_values)
 
             # Display the table after training using the new method
-            self.display_epoch_table(list(zip(range(1, self.num_epochs + 1), loss_values, accuracy_values)))
+            self._display_epoch_table(list(zip(range(1, self.num_epochs + 1), loss_values, accuracy_values)))
 
             self._print_confusion_matrix()
             # Save the trained model
@@ -126,7 +128,7 @@ class TransferLearning:
 
         return loss_values, accuracy_values
 
-    def set_optimiser(self):
+    def _set_optimiser(self):
         '''
         Sets the optimiser for the model.
 
@@ -141,7 +143,7 @@ class TransferLearning:
         elif self.optimiser == "sgdm":
             self.optimiser = optim.SGD(self.model.parameters(), lr=self.lr, momentum=self.momentum)
 
-    def use_pretrained_model(self):
+    def _use_pretrained_model(self):
         '''
         Sets the model to either AlexNet or GoogLeNet and modifies the classifier layers for AlexNet.
 
@@ -200,11 +202,22 @@ class TransferLearning:
         '''
 
         if self.datasetMode == "single":
-            train_path = "task3data/single/train"
-            test_path = "task3data/single/test"
+            if self.train_test_split == "70:30":
+                train_path = "task3_70-30_split/single/train"
+                test_path = "task3_70-30_split/single/test"
+
+            elif self.train_test_split == "60:40":
+                train_path = "task3_60-40_split/single/train"
+                test_path = "task3_60-40_split/single/test"
+
         elif self.datasetMode == "multiple":
-            train_path = "task3data/multiple/train"
-            test_path = "task3data/multiple/test"
+            if self.train_test_split == "70:30":
+                train_path = "task3_70-30_split/multiple/train"
+                test_path = "task3_70-30_split/multiple/test"
+
+            elif self.train_test_split == "60:40":
+                train_path = "task3_60-40_split/multiple/train"
+                test_path = "task3_60-40_split/multiple/test"
 
         # Load training data
         train_dataset = datasets.ImageFolder(train_path, transform=self.transform)
@@ -273,7 +286,7 @@ class TransferLearning:
         plt.ylabel('True')
         plt.show()
 
-    def display_epoch_table(self, table_data):
+    def _display_epoch_table(self, table_data):
         '''
         Displays a table with epoch, loss, and accuracy using matplotlib.
 
@@ -294,7 +307,7 @@ class TransferLearning:
 
         plt.show()
 
-    def plot_loss_graph(self, loss_values):
+    def _plot_loss_graph(self, loss_values):
         '''
         Plots a line graph for loss over epochs.
 
@@ -312,7 +325,7 @@ class TransferLearning:
         plt.legend()
         plt.show()
 
-    def plot_accuracy_graph(self, accuracy_values):
+    def _plot_accuracy_graph(self, accuracy_values):
         '''
         Plots a line graph for accuracy over epochs.
 
