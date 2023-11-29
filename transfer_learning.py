@@ -203,21 +203,21 @@ class TransferLearning:
 
         if self.datasetMode == "single":
             if self.train_test_split == "70:30":
-                train_path = "task3_70:30_split/single/train"
-                test_path = "task3_70:30_split/single/test"
+                train_path = "task3_70-30_split/single/train"
+                test_path = "task3_70-30_split/single/test"
 
             elif self.train_test_split == "60:40":
-                train_path = "task3_60:40_split/single/train"
-                test_path = "task3_60:40_split/single/test"
+                train_path = "task3_60-40_split/single/train"
+                test_path = "task3_60-40_split/single/test"
 
         elif self.datasetMode == "multiple":
             if self.train_test_split == "70:30":
-                train_path = "task3_70:30_split/multiple/train"
-                test_path = "task3_70:30_split/multiple/test"
+                train_path = "task3_70-30_split/multiple/train"
+                test_path = "task3_70-30_split/multiple/test"
 
             elif self.train_test_split == "60:40":
-                train_path = "task3_60:40_split/multiple/train"
-                test_path = "task3_60:40_split/multiple/test"
+                train_path = "task3_60-40_split/multiple/train"
+                test_path = "task3_60-40_split/multiple/test"
 
         # Load training data
         train_dataset = datasets.ImageFolder(train_path, transform=self.transform)
