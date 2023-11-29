@@ -39,7 +39,7 @@ model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=5000)
 #model.momentum = 0.3
 
 model.layers.append(Layer("tanh", 4,20))
-model.layers.append(Layer("relu", 20, 20))
+model.layers.append(Layer("tanh", 20, 20))
 model.layers.append(Layer("linear", 20, 3))
 
 model.compile(x_train, y_train)
