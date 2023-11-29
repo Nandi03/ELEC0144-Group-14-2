@@ -35,7 +35,7 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=5000)
+model = Model(learning_rate=0.0001, optimizer="sgd", one_hot=True, epochs=10000)
 #model.momentum = 0.3
 
 model.layers.append(Layer("tanh", 4,20))
@@ -44,7 +44,7 @@ model.layers.append(Layer("linear", 20, 3))
 
 model.compile(x_train, y_train)
 
-predictions = model.fit(x_test)
+predictions = model.fit(x_test, y_test)
 
 predictions = np.argmax(np.array([arr[0] for arr in predictions]), axis=1) # use this when using one-hot encoding
 #predictions = [round(i) for i in predictions] # use this when not using one-hot encoding.
@@ -82,7 +82,7 @@ plt.show()
 
 plt.figure(figsize=(8, 6))
 plt.plot(model.history['test'], color='blue', label='Training Loss')
-plt.xlabel('Epochs')
+plt.xlabel('Sample Number')
 plt.ylabel('Mean Squared Error')
 plt.title('Testing Loss Curve')
 plt.legend()

@@ -33,15 +33,15 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.001, epochs=5000, optimizer="sgd", one_hot=True)
+model = Model(learning_rate=0.001, epochs=10000, optimizer="sgd", one_hot=True)
 #model.momentum = 0.3
 
 # relu hidden layer
-model.layers.append(Layer("leaky_relu", 4, 5))
-model.layers[0].alpha = 0.2
-model.layers.append(Layer("leaky_relu", 5, 3))
+model.layers.append(Layer("tanh", 4, 5))
+model.layers[0].alpha = 0.7
+model.layers.append(Layer("tanh", 5, 3))
+model.layers.append(Layer("leaky_relu", 3, 3))
 model.layers[1].alpha = 0.7
-model.layers.append(Layer("linear", 3, 3))
 
 model.compile(x_train, y_train)
 
@@ -80,7 +80,7 @@ plt.show()
 
 plt.figure(figsize=(8, 6))
 plt.plot(model.history['test'], color='blue', label='Training Loss')
-plt.xlabel('Epochs')
+plt.xlabel('Sample Number')
 plt.ylabel('Mean Squared Error')
 plt.title('Testing Loss Curve')
 plt.legend()
