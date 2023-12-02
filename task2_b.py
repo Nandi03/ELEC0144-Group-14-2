@@ -79,7 +79,7 @@ plt.grid(True)
 plt.show()
 
 plt.figure(figsize=(8, 6))
-plt.plot(model.history['test'], color='blue', label='Training Loss')
+plt.plot(model.history['test'], color='blue', label='Testing Loss')
 plt.xlabel('Sample Number')
 plt.ylabel('Mean Squared Error')
 plt.title('Testing Loss Curve')

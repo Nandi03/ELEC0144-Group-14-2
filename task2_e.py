@@ -7,7 +7,7 @@ import seaborn as sns
 
 
 np.random.seed(42)
-
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------
 # Read data from the text file into a pandas DataFrame
 data = pd.read_csv('IrisData.txt', header=None, names=['col1', 'col2', 'col3', 'col4', 'class'])
 
@@ -34,7 +34,7 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.001, optimizer="sgd_momentum", epochs=10000)
+model = Model(learning_rate=0.001, optimizer="adam", epochs=10000)
 
 model.layers.append(Layer("tanh", 4, 5))
 model.layers.append(Layer("tanh", 5, 3))
@@ -54,6 +54,16 @@ plt.ylabel('Class')
 plt.title('Classification results')
 plt.legend()
 plt.grid(True)
+plt.show()
+
+# Plot confusion matrix
+cm = confusion_matrix(y_test, predictions)
+num_classes = 3
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('True')
 plt.show()
 
 error = y_test - predictions
@@ -76,21 +86,10 @@ plt.grid(True)
 plt.show()
 
 plt.figure(figsize=(8, 6))
-plt.plot(model.history['test'], color='blue', label='Training Loss')
-plt.xlabel('Epochs')
+plt.plot(model.history['test'], color='blue', label='Testing Loss')
+plt.xlabel('Sample Number')
 plt.ylabel('Mean Squared Error')
 plt.title('Testing Loss Curve')
 plt.legend()
 plt.grid(True)
-plt.show()
-
-cm = confusion_matrix(y_test, predictions)
-num_classes = 3
-
-# Plot confusion matrix
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
-plt.title('Confusion Matrix')
-plt.xlabel('Predicted')
-plt.ylabel('True')
 plt.show()

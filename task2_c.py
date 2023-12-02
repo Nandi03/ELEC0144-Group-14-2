@@ -61,6 +61,16 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+# Plot confusion matrix
+cm = confusion_matrix(y_test, predictions)
+num_classes = 3
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.show()
+
 error = y_test - predictions
 plt.figure(figsize=(8, 6))
 plt.plot(error,  color='red', label='Error')
@@ -81,7 +91,7 @@ plt.grid(True)
 plt.show()
 
 plt.figure(figsize=(8, 6))
-plt.plot(model.history['test'], color='blue', label='Training Loss')
+plt.plot(model.history['test'], color='blue', label='Testing Loss')
 plt.xlabel('Sample Number')
 plt.ylabel('Mean Squared Error')
 plt.title('Testing Loss Curve')
@@ -89,13 +99,5 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-cm = confusion_matrix(y_test, predictions)
-num_classes = 3
 
-# Plot confusion matrix
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
-plt.title('Confusion Matrix')
-plt.xlabel('Predicted')
-plt.ylabel('True')
-plt.show()
+
