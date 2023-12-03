@@ -322,7 +322,7 @@ class Layer:
         Initialise a layer with attributes; activation, input_shape and output_shape
         '''
         self.activation = activation
-        self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
+        self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape)) # Xavier Glorot Initialisation
         self.bias = np.zeros((1, output_shape)) 
         # for adam 
         self.m_W, self.m_B = 0, 0
@@ -362,7 +362,6 @@ class Layer:
         raise ValueError("Invalid Activation ")
 
 
-
     def get_derivative(self, x):
         '''
         Calculates the derivative of the layer's corresponding activation functions.
@@ -373,7 +372,7 @@ class Layer:
         > alpha (optional): used as the gradient for leaky ReLu
 
         Returns:
-        > the derivative wrt to the loss function for that layer as float(s)
+        > float or array: The derivative with respect to the pre-activation values for the layer.
         '''
         if self.activation == "sigmoid":
             return self.get_activation(x) * (1 - self.get_activation(x))
