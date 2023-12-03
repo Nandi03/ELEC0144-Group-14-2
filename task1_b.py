@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 np.random.seed(0)
-model = Model(learning_rate=0.1, optimizer="sgd", epochs=2000)
+model = Model(learning_rate=0.1, optimizer="sgd_adaptive", epochs=1000)
 #model.momentum = 0.3
 
 model.layers.append(Layer("tanh", 1, 3))
@@ -25,9 +25,9 @@ predictions = model.fit(x_test,y_test)
 plt.figure(figsize=(8, 6))
 plt.scatter(x_test, y_test, color='blue', label='Training Data')
 plt.plot(x_test, predictions, color='red', marker='o', linestyle='dashed', linewidth=2, markersize=8, label='Predictions')
-plt.xlabel('X_test')
-plt.ylabel('Y')
-plt.title('Cubic Function Approximation using Neural Network (Sequential Learning)')
+plt.xlabel('unseen data inputs')
+plt.ylabel('outputs')
+plt.title('Cubic regression for 1-3-1 ranh sgd NN')
 plt.legend()
 plt.grid(True)
 plt.show()

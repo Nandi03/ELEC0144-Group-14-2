@@ -74,13 +74,13 @@ class Model:
                 y, v_j, input = self.forward(x[i])
             
                 # backpropagation
-                loss = self.mse(d[i], y)
+                loss = self.squared_error(d[i], y)
                                     
                 output_grad = None
     
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
+                        output_grad = self.squared_error_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
 
@@ -103,13 +103,13 @@ class Model:
                 y, v_j, input = self.forward(x[i])
 
                 # Back propagation
-                loss = self.mse(d[i], y)
+                loss = self.squared_error(d[i], y)
 
                 output_grad = None
 
                 for j in range(len(self.layers)-1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
+                        output_grad = self.squared_error_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
                   
@@ -146,12 +146,12 @@ class Model:
                 y, v_j, input = self.forward(x[i])
             
                 # Backpropagation
-                loss = self.mse(d[i], y)
+                loss = self.squared_error(d[i], y)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
+                        output_grad = self.squared_error_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
 
@@ -179,12 +179,12 @@ class Model:
                 y, v_j, input = self.forward(x[i])
 
                 # Backpropagation
-                loss = self.mse(d[i], y)
+                loss = self.squared_error(d[i], y)
                 output_grad = None
 
                 for j in range(len(self.layers) - 1, -1, -1):
                     if j == len(self.layers) - 1:
-                        output_grad = self.mse_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
+                        output_grad = self.squared_error_grad(d[i], y) * self.layers[j].get_derivative(v_j[j])                   
                     else:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
                     
@@ -224,7 +224,7 @@ class Model:
             input.append(x_out)
         return x_out, v_j, input
     
-    def mse(self, actual, predicted):
+    def squared_error(self, actual, predicted):
         ''' 
         Calculate and return the squared error
 
@@ -243,7 +243,7 @@ class Model:
             actual = [one_hot]
         return 0.5 * ((predicted- actual)**2)
 
-    def mse_grad(self, actual, predicted):
+    def squared_error_grad(self, actual, predicted):
         ''' 
         Calculate and return the derivative of the squared error
         
@@ -284,7 +284,7 @@ class Model:
                 output_activated = self.layers[j].get_activation(x_out)
                 input = output_activated
             
-            loss = self.mse(y[i], output_activated)
+            loss = self.squared_error(y[i], output_activated)
             self.history['test'].append(float(np.sum(loss)))
             if len(output_activated[0]) == 1:
                 output_activated = np.sum(output_activated)
