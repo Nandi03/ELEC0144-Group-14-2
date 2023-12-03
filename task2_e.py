@@ -63,12 +63,9 @@ model = Model(learning_rate=0.1, optimizer="sgd_momentum", epochs=1000)
 # Using 10000 epochs
 #model = Model(learning_rate=0.001, optimizer="Adam", epochs=10000)
 
-
-
 model.layers.append(Layer("tanh", 4, 5))
 model.layers.append(Layer("tanh", 5, 3))
 model.layers.append(Layer("linear", 3, 3))
-
 
 model.compile(x_train, y_train)
 

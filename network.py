@@ -156,12 +156,12 @@ class Model:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
 
                     # Update velocities with momentum
-                    self.layers[j].velocity = self.momentum * self.layers[j].velocity + self.learning_rate * np.outer(input[j], output_grad)
-                    self.layers[j].bias_velocity = self.momentum * self.layers[j].bias_velocity + self.learning_rate * output_grad
+                    self.layers[j].velocity = self.momentum * self.layers[j].velocity +  np.outer(input[j], output_grad)
+                    self.layers[j].bias_velocity = self.momentum * self.layers[j].bias_velocity + output_grad
 
                     # Update weights and biases using momentum
-                    self.layers[j].weights -= self.layers[j].velocity
-                    self.layers[j].bias -= self.layers[j].bias_velocity
+                    self.layers[j].weights -= self.learning_rate * self.layers[j].velocity
+                    self.layers[j].bias -= self.learning_rate * self.layers[j].bias_velocity
                 cost += float(np.sum(loss))
             cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
@@ -322,7 +322,7 @@ class Layer:
         Initialise a layer with attributes; activation, input_shape and output_shape
         '''
         self.activation = activation
-        self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape))
+        self.weights = np.random.randn(input_shape, output_shape) * np.sqrt(2 / (input_shape + output_shape)) # Xavier Glorot Initialisation
         self.bias = np.zeros((1, output_shape)) 
         # for adam 
         self.m_W, self.m_B = 0, 0
@@ -362,7 +362,6 @@ class Layer:
         raise ValueError("Invalid Activation ")
 
 
-
     def get_derivative(self, x):
         '''
         Calculates the derivative of the layer's corresponding activation functions.
@@ -373,7 +372,7 @@ class Layer:
         > alpha (optional): used as the gradient for leaky ReLu
 
         Returns:
-        > the derivative wrt to the loss function for that layer as float(s)
+        > float or array: The derivative with respect to the pre-activation values for the layer.
         '''
         if self.activation == "sigmoid":
             return self.get_activation(x) * (1 - self.get_activation(x))

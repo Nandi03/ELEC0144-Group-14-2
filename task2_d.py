@@ -38,9 +38,9 @@ model = Model(learning_rate=0.001, epochs=10000, optimizer="sgd", one_hot=True)
 # uncomment the block of layers for the network you want to test for
 
 # tanh-tanh-linear ; Default
-model.layers.append(Layer("tanh", 4, 5))
-model.layers.append(Layer("tanh", 5, 3))
-model.layers.append(Layer("linear", 3, 3))
+#model.layers.append(Layer("tanh", 4, 5))
+#model.layers.append(Layer("tanh", 5, 3))
+#model.layers.append(Layer("linear", 3, 3))
 
 # relu-tanh-linear
 #model.layers.append(Layer("relu", 4, 5))
@@ -108,6 +108,11 @@ model.layers.append(Layer("linear", 3, 3))
 #model.layers.append(Layer("tanh", 4, 5))
 #model.layers.append(Layer("tanh", 5, 3))
 #model.layers.append(Layer("tanh", 3, 3))
+
+# linear-linear-linear
+model.layers.append(Layer("linear", 4, 5))
+model.layers.append(Layer("linear", 5, 3))
+model.layers.append(Layer("linear", 3, 3))
 
 model.compile(x_train, y_train)
 
