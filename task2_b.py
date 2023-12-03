@@ -36,13 +36,13 @@ x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
 # using 1000 epochs
-model = Model(learning_rate=0.1, optimizer="sgd", one_hot=True, epochs=1000)
+#model = Model(learning_rate=0.1, optimizer="sgd", one_hot=True, epochs=1000)
 #model = Model(learning_rate=0.01, optimizer="sgd", one_hot=True, epochs=1000)
 #model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=1000)
 #model = Model(learning_rate=0.0001, optimizer="sgd", one_hot=True, epochs=1000)
 
 # using 20000 epochs
-#model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=10000) # optimal
+model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=20000) # optimal
 
 # using 10000 epochs
 #model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=10000) # optimal
