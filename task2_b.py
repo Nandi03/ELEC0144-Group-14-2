@@ -42,17 +42,16 @@ y_train, y_test = data_y[:train_size], data_y[train_size:]
 #model = Model(learning_rate=0.0001, optimizer="sgd", one_hot=True, epochs=1000)
 
 # using 20000 epochs
-model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=20000) # optimal
-
-# using 10000 epochs
-#model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=10000) # optimal
+#model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=20000) # optimal
 
 # using 15000 epochs
 #model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=15000)
 
+# using 10000 epochs
+model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=10000) # optimal
+
 # using 5000 epochs
 #model = Model(learning_rate=0.001, optimizer="sgd", one_hot=True, epochs=5000)
-
 
 model.layers.append(Layer("tanh", 4,3))
 model.layers.append(Layer("tanh", 3, 3))

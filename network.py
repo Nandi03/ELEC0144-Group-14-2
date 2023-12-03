@@ -156,12 +156,12 @@ class Model:
                         output_grad = np.dot(output_grad, self.layers[j+1].weights.T) * self.layers[j].get_derivative(v_j[j])
 
                     # Update velocities with momentum
-                    self.layers[j].velocity = self.momentum * self.layers[j].velocity + self.learning_rate * np.outer(input[j], output_grad)
-                    self.layers[j].bias_velocity = self.momentum * self.layers[j].bias_velocity + self.learning_rate * output_grad
+                    self.layers[j].velocity = self.momentum * self.layers[j].velocity +  np.outer(input[j], output_grad)
+                    self.layers[j].bias_velocity = self.momentum * self.layers[j].bias_velocity + output_grad
 
                     # Update weights and biases using momentum
-                    self.layers[j].weights -= self.layers[j].velocity
-                    self.layers[j].bias -= self.layers[j].bias_velocity
+                    self.layers[j].weights -= self.learning_rate * self.layers[j].velocity
+                    self.layers[j].bias -= self.learning_rate * self.layers[j].bias_velocity
                 cost += float(np.sum(loss))
             cost /= len(x)
             # Append cost every epoch for plotting and tracking learning progress
