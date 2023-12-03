@@ -33,15 +33,81 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.01, epochs=10000, optimizer="sgd", one_hot=True)
-#model.momentum = 0.3
+model = Model(learning_rate=0.001, epochs=10000, optimizer="sgd", one_hot=True)
 
-# relu hidden layer
+# uncomment the block of layers for the network you want to test for
+
+# tanh-tanh-linear ; Default
 model.layers.append(Layer("tanh", 4, 5))
-model.layers[0].alpha = 0.7
 model.layers.append(Layer("tanh", 5, 3))
-model.layers.append(Layer("leaky_relu", 3, 3))
-model.layers[1].alpha = 0.7
+model.layers.append(Layer("linear", 3, 3))
+
+# relu-tanh-linear
+#model.layers.append(Layer("relu", 4, 5))
+#model.layers.append(Layer("tanh", 5, 3))
+#model.layers.append(Layer("linear", 3, 3))
+
+# tanh-relu-linear
+#model.layers.append(Layer("tanh", 4, 5))
+#model.layers.append(Layer("relu", 5, 3))
+#model.layers.append(Layer("linear", 3, 3))
+
+# relu-relu-linear
+#model.layers.append(Layer("relu", 4, 5))
+#model.layers.append(Layer("relu", 5, 3))
+#model.layers.append(Layer("linear", 3, 3))
+
+# leaky relu-tanh-linear
+#model.layers.append(Layer("leaky_relu", 4, 5))
+#model.layers[0].alpha = 0.7
+#model.layers.append(Layer("tanh", 5, 3))
+#model.layers.append(Layer("linear", 3, 3))
+
+# tanh-leaky relu-linear
+#model.layers.append(Layer("tanh", 4, 5))
+#model.layers.append(Layer("leaky_relu", 5, 3))
+#model.layers[1].alpha = 0.7
+#model.layers.append(Layer("linear", 3, 3))
+
+# leaky relu-leaky relu-linear ; test with learning rate 0.0001 and 0.001
+#model.layers.append(Layer("leaky_relu", 4, 5))
+#model.layers[0].alpha = 0.2 # test with alpha 0.7 and 0.2
+#model.layers.append(Layer("leaky_relu", 5, 3))
+#model.layers[1].alpha = 0.7 
+#model.layers.append(Layer("linear", 3, 3))
+
+# leaky relu-sigmoid-linear
+#model.layers.append(Layer("leaky_relu", 4, 5))
+#model.layers[0].alpha = 0.7
+#model.layers.append(Layer("sigmoid", 5, 3))
+#model.layers.append(Layer("linear", 3, 3))
+
+# sigmoid-leaky relu-linear
+#model.layers.append(Layer("sigmoid", 4, 5))
+#model.layers.append(Layer("leaky_relu", 5, 3))
+#model.layers[1].alpha = 0.7
+#model.layers.append(Layer("linear", 3, 3))
+
+# tanh-tanh-sigmoid
+#model.layers.append(Layer("tanh", 4, 5))
+#model.layers.append(Layer("tanh", 5, 3))
+#model.layers.append(Layer("sigmoid", 3, 3))
+
+# tanh-tanh-sigmoid
+#model.layers.append(Layer("tanh", 4, 5))
+#model.layers.append(Layer("tanh", 5, 3))
+#model.layers.append(Layer("leaky_relu", 3, 3))
+#model.layers[2].alpha = 0.7
+
+# tanh-tanh-sigmoid
+#model.layers.append(Layer("tanh", 4, 5))
+#model.layers.append(Layer("tanh", 5, 3))
+#model.layers.append(Layer("relu", 3, 3))
+
+# tanh-tanh-tanh
+#model.layers.append(Layer("tanh", 4, 5))
+#model.layers.append(Layer("tanh", 5, 3))
+#model.layers.append(Layer("tanh", 3, 3))
 
 model.compile(x_train, y_train)
 
@@ -58,7 +124,6 @@ plt.title('Classification results')
 plt.legend()
 plt.grid(True)
 plt.show()
-
 # Plot confusion matrix
 cm = confusion_matrix(y_test, predictions)
 num_classes = 3
@@ -66,7 +131,7 @@ plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
 plt.title('Confusion Matrix')
 plt.xlabel('Predicted')
-plt.ylabel('True')
+plt.ylabel('Actual')
 plt.show()
 
 error = y_test - predictions
@@ -74,7 +139,7 @@ plt.figure(figsize=(8, 6))
 plt.plot(error,  color='red', label='Error')
 plt.xlabel('Sample Number')
 plt.ylabel('Error')
-plt.title('Error')
+plt.title('Error between predictions and actual values')
 plt.legend()
 plt.grid(True)
 plt.show()
@@ -82,7 +147,7 @@ plt.show()
 plt.figure(figsize=(8, 6))
 plt.plot(model.history['train'], color='blue', label='Training Loss')
 plt.xlabel('Epochs')
-plt.ylabel('Mean Squared Error')
+plt.ylabel('Cost (using squared error)')
 plt.title('Training Loss Curve')
 plt.legend()
 plt.grid(True)
@@ -91,7 +156,7 @@ plt.show()
 plt.figure(figsize=(8, 6))
 plt.plot(model.history['test'], color='blue', label='Testing Loss')
 plt.xlabel('Sample Number')
-plt.ylabel('Mean Squared Error')
+plt.ylabel('Squared Error')
 plt.title('Testing Loss Curve')
 plt.legend()
 plt.grid(True)

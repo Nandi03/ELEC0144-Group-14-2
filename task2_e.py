@@ -5,9 +5,8 @@ import pandas as pd
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
-
 np.random.seed(42)
-# ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
 # Read data from the text file into a pandas DataFrame
 data = pd.read_csv('IrisData.txt', header=None, names=['col1', 'col2', 'col3', 'col4', 'class'])
 
@@ -34,7 +33,37 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
-model = Model(learning_rate=0.001, optimizer="adam", epochs=10000)
+# Using Stochastic Gradient Descent (SGD) with Momentum
+
+# using 1000 epochs
+model = Model(learning_rate=0.1, optimizer="sgd_momentum", epochs=1000)
+#model = Model(learning_rate=0.01, optimizer="sgd_momentum", epochs=1000)
+#model = Model(learning_rate=0.001, optimizer="sgd_momentum", epochs=1000)
+
+# using 5000 epochs
+#model = Model(learning_rate=0.01, optimizer="sgd_momentum", epochs=5000) # optimal for SGD + Momentum
+#model.momentum = 0.4
+
+# Using SGD with Adaptive Gradient (AdaGrad)
+
+# Using 1000 epochs
+#model = Model(learning_rate=0.1, optimizer="sgd_adaptive", epochs=1000)
+#model = Model(learning_rate=0.01, optimizer="sgd_adaptive", epochs=1000)
+
+# Using 5000 epochs
+#model = Model(learning_rate=0.01, optimizer="sgd_adaptive", epochs=5000) # optimal for SGD + AdaGrad
+
+# Using Adam
+
+# Using 1000 epochs
+#model = Model(learning_rate=0.1, optimizer="Adam", epochs=1000)
+#model = Model(learning_rate=0.01, optimizer="Adam", epochs=1000)
+#model = Model(learning_rate=0.001, optimizer="Adam", epochs=1000)
+
+# Using 10000 epochs
+#model = Model(learning_rate=0.001, optimizer="Adam", epochs=10000)
+
+
 
 model.layers.append(Layer("tanh", 4, 5))
 model.layers.append(Layer("tanh", 5, 3))
@@ -63,7 +92,7 @@ plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(num_classes), yticklabels=range(num_classes))
 plt.title('Confusion Matrix')
 plt.xlabel('Predicted')
-plt.ylabel('True')
+plt.ylabel('Actual')
 plt.show()
 
 error = y_test - predictions
@@ -71,7 +100,7 @@ plt.figure(figsize=(8, 6))
 plt.plot(error,  color='red', label='Error')
 plt.xlabel('Sample Number')
 plt.ylabel('Error')
-plt.title('Error')
+plt.title('Error between predictions and actual values')
 plt.legend()
 plt.grid(True)
 plt.show()
@@ -79,7 +108,7 @@ plt.show()
 plt.figure(figsize=(8, 6))
 plt.plot(model.history['train'], color='blue', label='Training Loss')
 plt.xlabel('Epochs')
-plt.ylabel('Mean Squared Error')
+plt.ylabel('Cost (using squared error)')
 plt.title('Training Loss Curve')
 plt.legend()
 plt.grid(True)
@@ -88,7 +117,7 @@ plt.show()
 plt.figure(figsize=(8, 6))
 plt.plot(model.history['test'], color='blue', label='Testing Loss')
 plt.xlabel('Sample Number')
-plt.ylabel('Mean Squared Error')
+plt.ylabel('Squared Error')
 plt.title('Testing Loss Curve')
 plt.legend()
 plt.grid(True)
