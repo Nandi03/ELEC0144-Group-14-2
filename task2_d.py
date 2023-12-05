@@ -99,7 +99,7 @@ model = Model(learning_rate=0.001, epochs=10000, optimizer="sgd", one_hot=True)
 #model.layers.append(Layer("leaky_relu", 3, 3))
 #model.layers[2].alpha = 0.7
 
-# tanh-tanh-sigmoid
+# tanh-tanh-relu
 #model.layers.append(Layer("tanh", 4, 5))
 #model.layers.append(Layer("tanh", 5, 3))
 #model.layers.append(Layer("relu", 3, 3))
@@ -110,7 +110,7 @@ model = Model(learning_rate=0.001, epochs=10000, optimizer="sgd", one_hot=True)
 #model.layers.append(Layer("tanh", 3, 3))
 
 # linear-linear-linear
-model.layers.append(Layer("linear", 4, 5))
+model.layers.append(Layer("tanh", 4, 5))
 model.layers.append(Layer("linear", 5, 3))
 model.layers.append(Layer("linear", 3, 3))
 

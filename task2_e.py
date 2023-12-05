@@ -36,7 +36,7 @@ y_train, y_test = data_y[:train_size], data_y[train_size:]
 # Using Stochastic Gradient Descent (SGD) with Momentum
 
 # using 1000 epochs
-model = Model(learning_rate=0.1, optimizer="sgd_momentum", epochs=1000)
+#model = Model(learning_rate=0.1, optimizer="sgd_momentum", epochs=1000)
 #model = Model(learning_rate=0.01, optimizer="sgd_momentum", epochs=1000)
 #model = Model(learning_rate=0.001, optimizer="sgd_momentum", epochs=1000)
 
@@ -51,17 +51,17 @@ model = Model(learning_rate=0.1, optimizer="sgd_momentum", epochs=1000)
 #model = Model(learning_rate=0.01, optimizer="sgd_adaptive", epochs=1000)
 
 # Using 5000 epochs
-#model = Model(learning_rate=0.01, optimizer="sgd_adaptive", epochs=5000) # optimal for SGD + AdaGrad
+#model = Model(learning_rate=0.1, optimizer="sgd_adaptive", epochs=5000) # optimal for SGD + AdaGrad
 
 # Using Adam
 
 # Using 1000 epochs
-#model = Model(learning_rate=0.1, optimizer="Adam", epochs=1000)
-#model = Model(learning_rate=0.01, optimizer="Adam", epochs=1000)
-#model = Model(learning_rate=0.001, optimizer="Adam", epochs=1000)
+#model = Model(learning_rate=0.1, optimizer="adam", epochs=1000)
+#model = Model(learning_rate=0.01, optimizer="adam", epochs=1000)
+#model = Model(learning_rate=0.001, optimizer="adam", epochs=1000)
 
 # Using 10000 epochs
-#model = Model(learning_rate=0.001, optimizer="Adam", epochs=10000)
+model = Model(learning_rate=0.001, optimizer="adam", epochs=10000) # optimal for Adam
 
 model.layers.append(Layer("tanh", 4, 5))
 model.layers.append(Layer("tanh", 5, 3))
