@@ -128,41 +128,80 @@ for n in learning_rate:
 
                         plt.figure(figsize=(14,10))
                         plt.scatter(x_test, y_test, color='blue', label='Training Data')
+
+                        # Plot the predicted values on the same graph
                         plt.plot(x_test, predictions, color='red', marker='o', linestyle='dashed', linewidth=2, markersize=8, label='Predictions')
+
+                        # Set labels for the axes
                         plt.xlabel('Unseen data inputs')
                         plt.ylabel('Outputs')
+
+                        # Set the title for the plot, providing information about the neural network configuration and current iteration
                         plt.title(f'Cubic regression for 1-{nodes}-1 {a} {o} NN ({i+1})')
+
+                        # Display legend indicating the meaning of different elements in the plot
                         plt.legend()
+
+                        # Add a grid to the plot
                         plt.grid(True)
+
+                        # Save the current plot as an image with a filename indicating the iteration number
                         prediction_filename = os.path.join(output_folder, f'Prediction_{i+1}.png')
                         plt.savefig(prediction_filename)
+
+                        # Close the current figure to start a new one for the next iteration
                         plt.close() 
-                        
-                        # if number of epochs is too large, plot the training loss curve
-                        # using logarithmic scale
+
+                        # If the number of epochs is too large, plot the training loss curve using logarithmic scale
                         if e >= 10000:
                             plt.figure(figsize=(14, 10))
+
+                            # Plot the training loss curve over epochs
                             plt.plot(model.history['train'], color='blue', label='Cost')
+
+                            # Set y-axis to a logarithmic scale
                             plt.yscale('log')
+
+                            # Set labels for the axes
                             plt.xlabel('Epochs')
                             plt.ylabel('Mean Squared Error')
+
+                            # Set the title for the plot, indicating it's a cost curve and the current iteration
                             plt.title(f'Cost Curve ({i+1})')
+
+                            # Display legend indicating the meaning of different elements in the plot
                             plt.legend()
+
+                            # Add a grid to the plot
                             plt.grid(True)
+
+                            # Save the current plot as an image with a filename indicating the iteration number
                             model_history_filename = os.path.join(output_folder, f'ModelHistory_{i+1}.png')
                             plt.savefig(model_history_filename)
+
+                            # Close the current figure
                             plt.close()
 
+                        # Print the current iteration number without a newline character
                         print(i, end=' ')
 
-                    plt.xlabel('Unseen data inputs')
-                    plt.ylabel('Outputs')
-                    plt.title(f'Cubic regression for 1-{nodes}-1 {a} {o} NN (All)')
+                        # After all iterations, create a final plot summarizing all predictions
+                        plt.xlabel('Unseen data inputs')
+                        plt.ylabel('Outputs')
+                        plt.title(f'Cubic regression for 1-{nodes}-1 {a} {o} NN (All)')
 
-                    plt.legend()
-                    plt.grid(True)
-                    plt.savefig(os.path.join(output_folder, 'AllPredictions.png'))
-                    plt.close()
+                        # Display legend indicating the meaning of different elements in the plot
+                        plt.legend()
+
+                        # Add a grid to the plot
+                        plt.grid(True)
+
+                        # Save the final plot summarizing all predictions as an image
+                        plt.savefig(os.path.join(output_folder, 'AllPredictions.png'))
+
+                        # Close the final figure
+                        plt.close()
+
 
 # Confirmation of completion
 print("Done")
