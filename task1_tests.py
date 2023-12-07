@@ -185,23 +185,22 @@ for n in learning_rate:
                         # Print the current iteration number without a newline character
                         print(i, end=' ')
 
-                        # After all iterations, create a final plot summarizing all predictions
-                        plt.xlabel('Unseen data inputs')
-                        plt.ylabel('Outputs')
-                        plt.title(f'Cubic regression for 1-{nodes}-1 {a} {o} NN (All)')
+                    # After all iterations, create a final plot summarizing all predictions
+                    plt.xlabel('Unseen data inputs')
+                    plt.ylabel('Outputs')
+                    plt.title(f'Cubic regression for 1-{nodes}-1 {a} {o} NN (All)')
 
-                        # Display legend indicating the meaning of different elements in the plot
-                        plt.legend()
+                    # Display legend indicating the meaning of different elements in the plot
+                    plt.legend()
 
-                        # Add a grid to the plot
-                        plt.grid(True)
+                    # Add a grid to the plot
+                    plt.grid(True)
 
-                        # Save the final plot summarizing all predictions as an image
-                        plt.savefig(os.path.join(output_folder, 'AllPredictions.png'))
+                    # Save the final plot summarizing all predictions as an image
+                    plt.savefig(os.path.join(output_folder, 'AllPredictions.png'))
 
-                        # Close the final figure
-                        plt.close()
-
-
+                    # Close the final figure
+                    plt.close()
+                    
 # Confirmation of completion
 print("Done")
