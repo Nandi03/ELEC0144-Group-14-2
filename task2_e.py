@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
+# set seed value for reproducability
 np.random.seed(42)
 
 # Read data from the text file into a pandas DataFrame
@@ -20,12 +21,14 @@ data['class_int'] = data['class'].map(label_to_int)
 data_x = np.array(data[['col1', 'col2', 'col3', 'col4']].values)
 data_y = np.array(data['class_int'].values)
 
+# Shuffle the data set for better generalisation and avoid overfitted models
 combined_data = list(zip(data_x, data_y))
 np.random.shuffle(combined_data)
 data_x, data_y = zip(*combined_data)
 data_x= np.array(data_x)
 data_y = np.array(data_y)
 
+# take the first 70% of the shuffled data for training
 total_samples = len(data_x)
 train_size = int(0.7 * total_samples)
 
@@ -33,16 +36,20 @@ train_size = int(0.7 * total_samples)
 x_train, x_test = data_x[:train_size], data_x[train_size:]
 y_train, y_test = data_y[:train_size], data_y[train_size:]
 
+# uncomment the instantiation of the Model with the hyperparameters and optimiser to test
+
 # Using Stochastic Gradient Descent (SGD) with Momentum
+# reminder: if no value for momentum is specified, the model uses 0.5 as default
 
 # using 1000 epochs
-model = Model(learning_rate=0.1, optimizer="sgd_momentum", epochs=1000)
+#model = Model(learning_rate=0.1, optimizer="sgd_momentum", epochs=1000)
 #model = Model(learning_rate=0.01, optimizer="sgd_momentum", epochs=1000)
 #model = Model(learning_rate=0.001, optimizer="sgd_momentum", epochs=1000)
 
 # using 5000 epochs
-#model = Model(learning_rate=0.01, optimizer="sgd_momentum", epochs=5000) # optimal for SGD + Momentum
-#model.momentum = 0.4
+model = Model(learning_rate=0.01, optimizer="sgd_momentum", epochs=5000) # optimal for SGD + Momentum using momentum 0.5
+
+#model.momentum = 0.6 # test with 0.4, 0.5 & 0.6
 
 # Using SGD with Adaptive Gradient (AdaGrad)
 
@@ -51,30 +58,34 @@ model = Model(learning_rate=0.1, optimizer="sgd_momentum", epochs=1000)
 #model = Model(learning_rate=0.01, optimizer="sgd_adaptive", epochs=1000)
 
 # Using 5000 epochs
-#model = Model(learning_rate=0.01, optimizer="sgd_adaptive", epochs=5000) # optimal for SGD + AdaGrad
+#model = Model(learning_rate=0.1, optimizer="sgd_adaptive", epochs=5000) # optimal for SGD + AdaGrad
 
 # Using Adam
 
 # Using 1000 epochs
-#model = Model(learning_rate=0.1, optimizer="Adam", epochs=1000)
-#model = Model(learning_rate=0.01, optimizer="Adam", epochs=1000)
-#model = Model(learning_rate=0.001, optimizer="Adam", epochs=1000)
+#model = Model(learning_rate=0.1, optimizer="adam", epochs=1000)
+#model = Model(learning_rate=0.01, optimizer="adam", epochs=1000)
+#model = Model(learning_rate=0.001, optimizer="adam", epochs=1000)
 
 # Using 10000 epochs
-#model = Model(learning_rate=0.001, optimizer="Adam", epochs=10000)
+#model = Model(learning_rate=0.001, optimizer="adam", epochs=10000) # optimal for Adam
 
-
-
+# Building the neural network and adding on its layers with the activation functions
 model.layers.append(Layer("tanh", 4, 5))
 model.layers.append(Layer("tanh", 5, 3))
 model.layers.append(Layer("linear", 3, 3))
 
-
+# train the model
 model.compile(x_train, y_train)
 
+# Make predictions using the model after training
 predictions = model.fit(x_test, y_test)
 predictions = [round(max(arr[0])) for arr in predictions]
-# Plot the training data, true cubic function, and predictions
+
+# PLOTTING GRAPHS
+# Clasification results as a line graph
+# showing the sample number of the x-axis and class on the y-axis
+# - for sample specific analysis
 plt.figure(figsize=(8, 6))
 plt.plot(y_test, color='red', label='Actual')
 plt.plot(predictions, color='blue', label="Predicted")
@@ -85,7 +96,9 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# Plot confusion matrix
+# Plot a confusion matrix
+# Showing the number of correct and incorrect predictions class 
+# - for class specific analysis
 cm = confusion_matrix(y_test, predictions)
 num_classes = 3
 plt.figure(figsize=(8, 6))
@@ -95,6 +108,9 @@ plt.xlabel('Predicted')
 plt.ylabel('Actual')
 plt.show()
 
+# Plot an error graph of the error between the actual and predicted values
+# Shows the sample number of the testing data set on the x-axis and the error on the y-axis
+# - for sample specific analysis
 error = y_test - predictions
 plt.figure(figsize=(8, 6))
 plt.plot(error,  color='red', label='Error')
@@ -105,6 +121,9 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+# Plot the training loss curve
+# Showing the number of epochs on the x-axis and the cost at that epoch on the y-axis
+# - useful for analysing convergence during training and other features of the training algorithm
 plt.figure(figsize=(8, 6))
 plt.plot(model.history['train'], color='blue', label='Training Loss')
 plt.xlabel('Epochs')
@@ -114,6 +133,9 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+# Plot the testing loss curve
+# Showing the sample number on the x-axis and the loss calculated on the y-axis
+# - useful for analysing generalisation or for sample specific analysis
 plt.figure(figsize=(8, 6))
 plt.plot(model.history['test'], color='blue', label='Testing Loss')
 plt.xlabel('Sample Number')
