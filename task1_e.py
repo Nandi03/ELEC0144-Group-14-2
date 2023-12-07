@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 np.random.seed(42)
 
 # Instantiate a Model object with its hyperparameters
-# uncomment the Model with the optimiser to test and fine tune hyperparameters
+
+# Task 1e - uncomment the Model with the optimiser to test and fine tune hyperparameters
 
 #model = Model(learning_rate=0.001, optimizer="sgd_momentum")
 #model = Model(learning_rate=0.001, optimizer="sgd_adaptive")
