@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 np.random.seed(42)
 
 # Instantiate a Model object with its hyperparameters
-model = Model(learning_rate=0.01, optimizer="adam")
+model = Model(learning_rate=0.1, optimizer="sgd")
 
 # Building the neural network and adding on its layers with the activation functions
 

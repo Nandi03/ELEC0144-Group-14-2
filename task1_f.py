@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 np.random.seed(42)
 
 # Instantiate a Model object with its hyperparameters
-model = Model(learning_rate=0.01, optimizer="sgd")
+model = Model(learning_rate=0.1, optimizer="sgd", epochs=2000)
 
 # Building the neural network and adding on its layers with the activation functions
 model.layers.append(Layer("sigmoid", 1, 3))
@@ -20,7 +20,7 @@ num_elements = int(0.8 * len(x_train)) # can change 0.8 to another value, test w
 selected_indices = np.random.choice(len(x_train), num_elements, replace=False)
 x_train = x_train[selected_indices] #  test with different sized training data
 
-d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train))
+d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train)) # add randomness
 
 # train the network
 model.compile(x_train, d_train)
