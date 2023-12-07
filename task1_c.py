@@ -10,6 +10,11 @@ model = Model(learning_rate=0.01, optimizer="adam")
 
 # Building the neural network and adding on its layers with the activation functions
 
+# Task 1c - modify values of the 'input_size' and 'output_size' of each layer to change the nmber of nodes.
+# e.g. to increase the number of nodes in layer 1 to 7 nodes:
+#       model.layers.append(Layer("sigmoid", 1, 7))
+#       model.layers.append(Layer("linear", 7, 1))
+
 model.layers.append(Layer("sigmoid", 1, 3))
 model.layers.append(Layer("linear", 3, 1))
 
@@ -28,8 +33,8 @@ y_test = 0.8* x_test**3 + 0.3 * x_test**2 - 0.4*x_test
 predictions = model.fit(x_test, y_test)
 
 # PLOTTING GRAPHS
-# Clasification results as a line graph
-# showing the x_train values on the x-axis and predicted values on the y-axis
+# Regression results as a line graph
+# showing the x_test values on the x-axis and predicted values on the y-axis
 plt.figure(figsize=(8, 6))
 plt.scatter(x_test, y_test, color='blue', label='Training Data')
 plt.plot(x_test, predictions, color='red', marker='o', linestyle='dashed', linewidth=2, markersize=8, label='Predictions')
