@@ -9,7 +9,7 @@ np.random.seed(42)
 model = Model(learning_rate=0.1, optimizer="sgd", epochs=2000)
 
 # Building the neural network and adding on its layers with the activation functions
-model.layers.append(Layer("sigmoid", 1, 3))
+model.layers.append(Layer("tanh", 1, 3))
 model.layers.append(Layer("linear", 3, 1))
 
 # Creating the training data set
