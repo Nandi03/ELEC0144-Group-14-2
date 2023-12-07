@@ -15,7 +15,7 @@ model = Model(learning_rate=0.1, optimizer="sgd")
 #       model.layers.append(Layer("sigmoid", 1, 7))
 #       model.layers.append(Layer("linear", 7, 1))
 
-model.layers.append(Layer("sigmoid", 1, 3))
+model.layers.append(Layer("tanh", 1, 3))
 model.layers.append(Layer("linear", 3, 1))
 
 # Creating the training data set
