@@ -244,7 +244,7 @@ class TransferLearning:
         # Extract the classifier layers
         classifier_layers = list(self.model.classifier.children())
 
-        # Replace the specified number of layers before the last two layers
+        # Replace the specified number of layers before the last two layers and add our own output layer
         modified_classifier = nn.Sequential(*classifier_layers[:-num_layers_to_replace], nn.Linear(4096, self.num_classes))
 
         # Set the modified classifier back to the model
