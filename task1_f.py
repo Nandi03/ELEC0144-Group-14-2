@@ -15,10 +15,10 @@ model.layers.append(Layer("linear", 3, 1))
 # Creating the training data set
 x_train = np.arange(-1, 1, 0.05)
 
-# Select % of the training data set randomly 
+# Task 1f - Select % of the training data set randomly 
 num_elements = int(0.8 * len(x_train)) # can change 0.8 to another value, test with 0.8 and 0.5
 selected_indices = np.random.choice(len(x_train), num_elements, replace=False)
-# x_train = x_train[selected_indices] # uncomment to test with different sized training data
+x_train = x_train[selected_indices] #  test with different sized training data
 
 d_train = 0.8 * x_train**3 + 0.3 * x_train**2 - 0.4 * x_train + np.random.normal(0, 0.02, len(x_train))
 
