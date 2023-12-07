@@ -35,6 +35,7 @@ class TransferLearning:
             None
         '''
        
+        # List of class names for classification
         self.class_names = ["Durian", "Kiwi", "Mango", "Mangosteen", "Papaya"]
         self.model_name = model_name
         self.optimiser = optimiser
@@ -91,8 +92,6 @@ class TransferLearning:
             self._display_epoch_table(list(zip(range(1, self.num_epochs + 1), loss_values, accuracy_values)))
 
             self._print_confusion_matrix()
-            # Save the trained model
-            # torch.save(self.model.state_dict(), f'fruit_classifier_{self.model_name}.pth')
 
 
     def _train_and_evaluate(self):
@@ -245,7 +244,7 @@ class TransferLearning:
         # Extract the classifier layers
         classifier_layers = list(self.model.classifier.children())
 
-        # Replace the specified number of layers before the last two layers
+        # Replace the specified number of layers before the last two layers and add our own output layer
         modified_classifier = nn.Sequential(*classifier_layers[:-num_layers_to_replace], nn.Linear(4096, self.num_classes))
 
         # Set the modified classifier back to the model
@@ -299,7 +298,7 @@ class TransferLearning:
         fig, ax = plt.subplots(figsize=(8, 6))
         ax.axis('tight')
         ax.axis('off')
-        headers = ['Epoch', 'Loss', 'Accuracy']
+        headers = ['Epoch', 'Loss', 'Accuracy (%)']
         table = ax.table(cellText=table_data, colLabels=headers, cellLoc='center', loc='center', colColours=['#f3f3f3']*3)
         table.auto_set_font_size(False)
         table.set_fontsize(10)
