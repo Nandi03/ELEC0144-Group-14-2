@@ -6,11 +6,16 @@ import matplotlib.pyplot as plt
 np.random.seed(42)
 
 # Instantiate a Model object with its hyperparameters
-model = Model(learning_rate=0.01, optimizer="sgd")
+model = Model(learning_rate=0.1, optimizer="sgd")
 
 # Building the neural network and adding on its layers with the activation functions
 
-model.layers.append(Layer("tanh", 1, 3))
+# Task 1d - modify the activation functions for each layer by modifying str value of 'activation_function'
+# e.g. to change the first hidden layer to use relu:
+#       model.layers.append(Layer("relu", 1, 3)) # use string 'relu'
+# other activation functions including, sigmoid, leaky_relu, linear and tanh.
+
+model.layers.append(Layer("relu", 1, 3))
 model.layers.append(Layer("linear", 3, 1))
 
 # Creating the training data set
@@ -28,8 +33,8 @@ y_test = 0.8* x_test**3 + 0.3 * x_test**2 - 0.4*x_test
 predictions = model.fit(x_test, y_test)
 
 # PLOTTING GRAPHS
-# Clasification results as a line graph
-# showing the x_train values on the x-axis and predicted values on the y-axis
+# Regression results as a line graph
+# showing the x_test values on the x-axis and predicted values on the y-axis
 plt.figure(figsize=(8, 6))
 plt.scatter(x_test, y_test, color='blue', label='Training Data')
 plt.plot(x_test, predictions, color='red', marker='o', linestyle='dashed', linewidth=2, markersize=8, label='Predictions')

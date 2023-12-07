@@ -33,8 +33,8 @@ y_test = 0.8* x_test**3 + 0.3 * x_test**2 - 0.4*x_test
 predictions = model.fit(x_test, y_test)
 
 # PLOTTING GRAPHS
-# Clasification results as a line graph
-# showing the x_train values on the x-axis and predicted values on the y-axis
+# Regression results as a line graph
+# showing the x_test values on the x-axis and predicted values on the y-axis
 plt.figure(figsize=(8, 6))
 plt.scatter(x_test, y_test, color='blue', label='Training Data')
 plt.plot(x_test, predictions, color='red', marker='o', linestyle='dashed', linewidth=2, markersize=8, label='Predictions')
